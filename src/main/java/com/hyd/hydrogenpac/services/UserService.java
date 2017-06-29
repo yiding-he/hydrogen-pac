@@ -34,4 +34,8 @@ public class UserService extends AbstractService {
 
         return passMatch;
     }
+
+    public String getUserName(HttpSession session) {
+        return String.valueOf(session.getAttribute(SESSION_KEY));
+    }
 }

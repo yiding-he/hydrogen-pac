@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>hydrogen-pac</name>
-	<description>Demo project for Spring Boot</description>
+	<name>Demo project for Spring Boot</name>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
