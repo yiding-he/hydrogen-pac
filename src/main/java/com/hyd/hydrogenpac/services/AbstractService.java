@@ -1,7 +1,7 @@
 package com.hyd.hydrogenpac.services;
 
+import com.hyd.hydrogenpac.redis.Redis;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * @author yiding.he
@@ -9,9 +9,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 public abstract class AbstractService {
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    Redis redis;
 
-    RedisTemplate<String, Object> getRedis() {
-        return redisTemplate;
+    String combine(String... strs) {
+        return String.join(":", strs);
     }
 }

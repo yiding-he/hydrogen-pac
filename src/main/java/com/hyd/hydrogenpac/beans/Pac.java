@@ -8,13 +8,13 @@ import java.util.List;
  */
 public class Pac {
 
-    private List<PatternList> patternLists = new ArrayList<>();
+    private List<PatternList> patternListSettings = new ArrayList<>();
 
-    public List<PatternList> getPatternLists() {
-        return patternLists;
+    public List<PatternList> getPatternListSettings() {
+        return patternListSettings;
     }
 
-    public void setPatternLists(List<PatternList> patternLists) {
-        this.patternLists = patternLists;
+    public void setPatternListSettings(List<PatternList> patternListSettings) {
+        this.patternListSettings = patternListSettings;
     }
 }

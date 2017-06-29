@@ -7,7 +7,7 @@ import java.util.List;
  */
 public class PatternList {
 
-    private List<String> pattens;
+    private List<String> patternList;
 
     private int priority;
 
@@ -15,12 +15,12 @@ public class PatternList {
 
     private ListType listType;
 
-    public List<String> getPattens() {
-        return pattens;
+    public List<String> getPatternList() {
+        return patternList;
     }
 
-    public void setPattens(List<String> pattens) {
-        this.pattens = pattens;
+    public void setPatternList(List<String> patternList) {
+        this.patternList = patternList;
     }
 
     public int getPriority() {

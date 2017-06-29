@@ -11,13 +11,13 @@ import javax.servlet.http.HttpSession;
 @Component
 public class UserService extends AbstractService {
 
-    public static final String SESSION_KEY = "user";
+    private static final String SESSION_KEY = "user";
 
-    public static final String REDIS_HASH_KEY = "hydrogen-pac-users";
+    private static final String USERS_HASH_KEY = "hydrogen-pac-users";
 
     @PostConstruct
     private void init() {
-        getRedis().opsForHash().put(REDIS_HASH_KEY, "admin", "admin123");
+        redis.getHash(USERS_HASH_KEY).put("admin", "admin123");
     }
 
     public boolean isUserLoggedIn(HttpSession session) {
@@ -25,14 +25,14 @@ public class UserService extends AbstractService {
     }
 
     public boolean login(HttpSession session, String user, String pass) {
-        String _pass = String.valueOf(getRedis().opsForHash().get(REDIS_HASH_KEY, user));
-        boolean passMatch = pass.equals(_pass);
+        String _pass = String.valueOf(redis.getHash(USERS_HASH_KEY).get(user));
 
-        if (passMatch) {
+        if (pass.equals(_pass)) {
             session.setAttribute(SESSION_KEY, user);
+            return true;
+        } else {
+            return false;
         }
-
-        return passMatch;
     }
 
     public String getUserName(HttpSession session) {

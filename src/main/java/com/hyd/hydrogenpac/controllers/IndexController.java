@@ -42,8 +42,8 @@ public class IndexController {
     public String index(HttpSession session, Model model) {
         if (userService.isUserLoggedIn(session)) {
             String user = userService.getUserName(session);
-            List<PatternList> patternLists = pacService.getPatternLists(user);
-            model.addAttribute("patternLists", patternLists);
+            List<PatternList> patternListSettings = pacService.getPatternLists(user);
+            model.addAttribute("patternListSettings", patternListSettings);
             return "main";
         } else {
             return "redirect:login";
