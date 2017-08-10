@@ -13,23 +13,9 @@
 </head>
 <body>
 
-<form action="login" method="post">
-    <table>
-        <tr>
-            <td>用户名</td>
-            <td><input type="text" name="user"></td>
-        </tr>
-        <tr>
-            <td>密码</td>
-            <td><input type="password" name="pass"></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <button type="submit">登录</button>
-            </td>
-        </tr>
-    </table>
-</form>
+<#list loginEntries as entry>
+<p><a href="${entry.loginUrl}">使用${entry.getType().getName()}账号登录</a></p>
+</#list>
 
 </body>
 </html>
