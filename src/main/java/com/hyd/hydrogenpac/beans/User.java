@@ -1,5 +1,7 @@
 package com.hyd.hydrogenpac.beans;
 
+import com.hyd.hydrogenpac.oauth.OAuthServiceType;
+
 /**
  * (description)
  * created at 2017/8/10
@@ -8,11 +10,21 @@ package com.hyd.hydrogenpac.beans;
  */
 public class User {
 
+    private OAuthServiceType oAuthServiceType;
+
     private String username;
 
     private String userId;
 
     private String avatar;
+
+    public OAuthServiceType getoAuthServiceType() {
+        return oAuthServiceType;
+    }
+
+    public void setoAuthServiceType(OAuthServiceType oAuthServiceType) {
+        this.oAuthServiceType = oAuthServiceType;
+    }
 
     public String getUsername() {
         return username;

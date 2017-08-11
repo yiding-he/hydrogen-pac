@@ -66,6 +66,7 @@ public class BaiduOAuthService extends OAuthService {
         JSONObject baiduUserInfo = getBaiduUserInfo(accessToken);
 
         User user = new User();
+        user.setoAuthServiceType(getType());
         user.setUserId(baiduUserInfo.getString("uid"));
         user.setUsername(baiduUserInfo.getString("uname"));
         user.setAvatar(AVATAR_URL_PATTERN.replace("${portrait}", baiduUserInfo.getString("portrait")));
