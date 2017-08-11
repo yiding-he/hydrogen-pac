@@ -1,15 +1,17 @@
 package com.hyd.hydrogenpac.services;
 
 import com.hyd.hydrogenpac.beans.User;
+import com.hyd.hydrogenpac.oauth.OAuthServiceType;
 import org.dizitart.no2.Document;
 import org.dizitart.no2.NitriteCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpSession;
+import javax.annotation.PostConstruct;
 
-import static org.dizitart.no2.filters.Filters.and;
-import static org.dizitart.no2.filters.Filters.eq;
+import static org.dizitart.no2.filters.Filters.*;
 
 /**
  * @author yiding.he
@@ -17,31 +19,67 @@ import static org.dizitart.no2.filters.Filters.eq;
 @Component
 public class UserService extends AbstractService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
+
     @Value("${server.session.timeout}")
     private int sessionExpireSeconds;
 
-    private static final String SESSION_KEY = "user";
-
-    public boolean isUserLoggedIn(HttpSession session) {
-        return session.getAttribute(SESSION_KEY) != null;
+    @PostConstruct
+    private void init() {
+        LOG.info("current users: ");
+        getUserCollection().find().forEach(doc -> LOG.info(doc.toString()));
     }
 
-    public User getUser(HttpSession session) {
-        return (User) session.getAttribute(SESSION_KEY);
+    public User getLoggedInUser(String token) {
+        long currentTime = System.currentTimeMillis() / 1000;
+
+        Document document = getUserCollection().find(and(
+                eq("token", token),
+                gt("tokenExpire", currentTime)
+        )).firstOrDefault();
+
+        if (document == null) {
+            return null;
+        } else {
+            return parseUser(document);
+        }
     }
 
-    public void onUserLoggedIn(User user, HttpSession session) {
-        session.setAttribute(SESSION_KEY, user);
+    private User parseUser(Document document) {
+        User user = new User();
+        user.setoAuthServiceType(OAuthServiceType.valueOf(document.get("type", String.class)));
+        user.setUserId(document.get("userId", String.class));
+        user.setUsername(document.get("userName", String.class));
+        user.setAvatar(document.get("avatar", String.class));
+        return user;
+    }
+
+    public void onUserLoggedIn(User user, String token) {
+
+        long tokenExpire = System.currentTimeMillis() / 1000 + sessionExpireSeconds;
 
         if (!userExists(user)) {
-            long tokenExpire = System.currentTimeMillis() / 1000 + sessionExpireSeconds;
+            LOG.info("Create user record: " + user);
 
             getUserCollection().insert(new Document()
                     .put("type", user.getoAuthServiceType().name())
                     .put("userId", user.getUserId())
+                    .put("userName", user.getUsername())
                     .put("avatar", user.getAvatar())
-                    .put("token", session.getId())
+                    .put("token", token)
                     .put("tokenExpire", tokenExpire));
+        } else {
+            LOG.info("Update user record: " + user);
+
+            getUserCollection().update(
+                    and(
+                            eq("userId", user.getUserId()),
+                            eq("type", user.getoAuthServiceType().name())
+                    ),
+                    new Document()
+                            .put("token", token)
+                            .put("tokenExpire", tokenExpire)
+            );
         }
     }
 
@@ -49,7 +87,7 @@ public class UserService extends AbstractService {
         return getUserCollection().find(and(
                 eq("type", user.getoAuthServiceType().name()),
                 eq("userId", user.getUserId())
-        )).hasMore();
+        )).totalCount() > 0;
     }
 
     private NitriteCollection getUserCollection() {

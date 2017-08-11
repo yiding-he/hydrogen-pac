@@ -1,6 +1,5 @@
 package com.hyd.hydrogenpac.controllers;
 
-import com.hyd.hydrogenpac.beans.PatternList;
 import com.hyd.hydrogenpac.beans.User;
 import com.hyd.hydrogenpac.oauth.OAuthEntry;
 import com.hyd.hydrogenpac.oauth.OAuthService;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +23,7 @@ import java.util.stream.Collectors;
  * @author yiding.he
  */
 @Controller
-public class IndexController {
+public class IndexController extends AbstractController {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexController.class);
 
@@ -53,26 +51,26 @@ public class IndexController {
     }
 
     @GetMapping("/auth/callback/baidu")
-    public String callbackBaidu(String code, Model model, HttpSession session) throws IOException {
+    public String callbackBaidu(String code) throws IOException {
 
         OAuthService baiduOAuthService = oAuthServiceFactory.getOAuthService(OAuthServiceType.Baidu);
         User user = baiduOAuthService.getUser(code);
 
-        userService.onUserLoggedIn(user, session);
-
-        model.addAttribute("user", user);
-        return "auth_callback_baidu";
+        userService.onUserLoggedIn(user, getToken());
+        return "redirect:../../main";
     }
 
     @GetMapping(value = {"/", "/main"})
-    public String index(HttpSession session, Model model) {
-        if (userService.isUserLoggedIn(session)) {
-            User user = userService.getUser(session);
-            List<PatternList> patternListSettings = pacService.getPatternLists(user);
-            model.addAttribute("patternListSettings", patternListSettings);
-            return "main";
-        } else {
+    public String index(Model model) {
+        User user = getUser();
+
+        if (user == null) {
+            LOG.info("Token " + getToken() + " need login.");
             return "redirect:login";
+        } else {
+            model.addAttribute("user", user);
+            return "main";
         }
+
     }
 }
