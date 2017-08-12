@@ -42,6 +42,14 @@ public class BaiduOAuthService extends OAuthService {
     private NgrokConfig ngrokConfig;
 
     @Override
+    public boolean isEnabled() {
+        return Str.notEmpty(
+                authConfig.getBaiduApiKey(),
+                authConfig.getBaiduApiSecret()
+        );
+    }
+
+    @Override
     public OAuthEntry getOAuthEntry() {
 
         String callbackUrl = getCallbackUrl();

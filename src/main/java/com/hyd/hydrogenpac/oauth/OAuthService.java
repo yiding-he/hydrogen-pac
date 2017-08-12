@@ -55,4 +55,6 @@ public abstract class OAuthService {
     public abstract OAuthEntry getOAuthEntry();
 
     public abstract User getUser(String authCode);
+
+    public abstract boolean isEnabled();
 }

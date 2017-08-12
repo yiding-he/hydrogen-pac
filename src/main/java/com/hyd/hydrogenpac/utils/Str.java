@@ -18,4 +18,23 @@ public class Str {
             return s;
         }
     }
+
+    public static boolean empty(String s) {
+        return s == null || s.length() == 0 || s.trim().length() == 0;
+    }
+
+    public static boolean notEmpty(String s) {
+        return s != null && s.length() > 0 && s.trim().length() > 0;
+    }
+
+    // 所有参数都不为空
+    public static boolean notEmpty(String... ss) {
+        for (String s : ss) {
+            if (empty(s)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

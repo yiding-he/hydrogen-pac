@@ -1,10 +1,12 @@
 package com.hyd.hydrogenpac.controllers;
 
+import com.hyd.hydrogenpac.config.CookieConfig;
 import com.hyd.hydrogenpac.services.UserService;
 import com.hyd.hydrogenpac.utils.Cookies;
 import com.hyd.hydrogenpac.utils.RandomStringGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -22,8 +24,10 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class SessionInterceptor implements HandlerInterceptor {
 
-    @Value("${server.session.timeout}")
-    private int sessionExpireSeconds;
+    private static final Logger LOG = LoggerFactory.getLogger(SessionInterceptor.class);
+
+    @Autowired
+    CookieConfig cookieConfig;
 
     @Autowired
     UserService userService;
@@ -31,10 +35,14 @@ public class SessionInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
 
-        String token = Cookies.from(request).getCookieValue("token");
+        Cookies cookies = Cookies.from(request);
+        String token = cookies.getCookieValue("token");
+
         if (token == null) {
+            LOG.info("Generating new token");
             token = RandomStringGenerator.generate(40, true, true, true);
-            response.addCookie(Cookies.newCookie("token", token, sessionExpireSeconds));
+            response.addCookie(Cookies.newCookie(
+                    "token", token, cookieConfig.getDomain(), cookieConfig.getExpiry()));
         }
 
         Object controller = ((HandlerMethod) o).getBean();

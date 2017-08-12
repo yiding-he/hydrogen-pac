@@ -2,18 +2,16 @@ package com.hyd.hydrogenpac.utils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Cookies {
 
     private Map<String, Cookie> cookies = new HashMap<>();
 
-    public static Cookie newCookie(String name, String value, int expiry) {
+    public static Cookie newCookie(String name, String value, String domain, int expiry) {
         Cookie cookie = new Cookie(name, value);
+        if (Str.notEmpty(domain)) cookie.setDomain(domain);
         cookie.setMaxAge(expiry);
         return cookie;
     }
@@ -23,7 +21,11 @@ public class Cookies {
     }
 
     private Cookies(Cookie[] cookies) {
-        this.cookies = Arrays.stream(cookies).collect(Collectors.toMap(Cookie::getName, c -> c));
+        if (cookies == null) {
+            this.cookies = Collections.emptyMap();
+        } else {
+            this.cookies = Arrays.stream(cookies).collect(Collectors.toMap(Cookie::getName, c -> c));
+        }
     }
 
     public Cookie getCookie(String name) {

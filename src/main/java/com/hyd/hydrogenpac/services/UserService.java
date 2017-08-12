@@ -1,12 +1,13 @@
 package com.hyd.hydrogenpac.services;
 
 import com.hyd.hydrogenpac.beans.User;
+import com.hyd.hydrogenpac.config.CookieConfig;
 import com.hyd.hydrogenpac.oauth.OAuthServiceType;
 import org.dizitart.no2.Document;
 import org.dizitart.no2.NitriteCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -21,8 +22,8 @@ public class UserService extends AbstractService {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
-    @Value("${server.session.timeout}")
-    private int sessionExpireSeconds;
+    @Autowired
+    CookieConfig cookieConfig;
 
     @PostConstruct
     private void init() {
@@ -56,7 +57,7 @@ public class UserService extends AbstractService {
 
     public void onUserLoggedIn(User user, String token) {
 
-        long tokenExpire = System.currentTimeMillis() / 1000 + sessionExpireSeconds;
+        long tokenExpire = System.currentTimeMillis() / 1000 + cookieConfig.getExpiry();
 
         if (!userExists(user)) {
             LOG.info("Create user record: " + user);

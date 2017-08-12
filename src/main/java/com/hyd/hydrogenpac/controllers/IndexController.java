@@ -39,11 +39,12 @@ public class IndexController extends AbstractController {
     @GetMapping("/login")
     public String login(Model model) {
 
-        List<OAuthEntry> entryList = Arrays.stream(OAuthServiceType.values())
-                .map(type -> {
-                    OAuthService oAuthService = oAuthServiceFactory.getOAuthService(type);
-                    return oAuthService.getOAuthEntry();
-                })
+        OAuthServiceType[] oAuthServiceTypes = OAuthServiceType.values();
+
+        List<OAuthEntry> entryList = Arrays.stream(oAuthServiceTypes)
+                .map(oAuthServiceFactory::getOAuthService)
+                .filter(OAuthService::isEnabled)
+                .map(OAuthService::getOAuthEntry)
                 .collect(Collectors.toList());
 
         model.addAttribute("loginEntries", entryList);
