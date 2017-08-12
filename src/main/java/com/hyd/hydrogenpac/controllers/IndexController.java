@@ -1,11 +1,13 @@
 package com.hyd.hydrogenpac.controllers;
 
+import com.hyd.hydrogenpac.beans.Result;
 import com.hyd.hydrogenpac.beans.User;
 import com.hyd.hydrogenpac.oauth.OAuthEntry;
 import com.hyd.hydrogenpac.oauth.OAuthService;
 import com.hyd.hydrogenpac.oauth.OAuthServiceFactory;
 import com.hyd.hydrogenpac.oauth.OAuthServiceType;
-import com.hyd.hydrogenpac.services.PacService;
+import com.hyd.hydrogenpac.services.PatternsService;
+import com.hyd.hydrogenpac.services.ProxyService;
 import com.hyd.hydrogenpac.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -31,7 +35,10 @@ public class IndexController extends AbstractController {
     private UserService userService;
 
     @Autowired
-    private PacService pacService;
+    private ProxyService proxyService;
+
+    @Autowired
+    private PatternsService patternsService;
 
     @Autowired
     private OAuthServiceFactory oAuthServiceFactory;
@@ -44,20 +51,24 @@ public class IndexController extends AbstractController {
         List<OAuthEntry> entryList = Arrays.stream(oAuthServiceTypes)
                 .map(oAuthServiceFactory::getOAuthService)
                 .filter(OAuthService::isEnabled)
-                .map(OAuthService::getOAuthEntry)
+                .map(this::getOAuthEntry)
                 .collect(Collectors.toList());
 
         model.addAttribute("loginEntries", entryList);
         return "login";
     }
 
+    private OAuthEntry getOAuthEntry(OAuthService oAuthService) {
+        return oAuthService.getOAuthEntry(getRequestUrl());
+    }
+
     @GetMapping("/auth/callback/baidu")
     public String callbackBaidu(String code) throws IOException {
 
         OAuthService baiduOAuthService = oAuthServiceFactory.getOAuthService(OAuthServiceType.Baidu);
-        User user = baiduOAuthService.getUser(code);
+        User user = baiduOAuthService.getUser(code, getRequestUrl());
 
-        userService.onUserLoggedIn(user, getToken());
+        userService.onUserLoggedIn(user.getType(), user.getUserId(), user.getUsername(), user.getAvatar(), getToken());
         return "redirect:../../main";
     }
 
@@ -70,8 +81,30 @@ public class IndexController extends AbstractController {
             return "redirect:login";
         } else {
             model.addAttribute("user", user);
+            model.addAttribute("proxies", proxyService.getProxies(user));
+            model.addAttribute("patterns", patternsService.getPatterns(user));
             return "main";
         }
+    }
 
+    @PostMapping("/proxy/add")
+    @ResponseBody
+    public Result addProxy(String name, String value) {
+        proxyService.addProxy(getUser(), name, value);
+        return Result.success();
+    }
+
+    @PostMapping("/proxy/delete")
+    @ResponseBody
+    public Result deleteProxy(String name) {
+        proxyService.deleteProxy(getUser(), name);
+        return Result.success();
+    }
+
+    @PostMapping("/patterns/add")
+    @ResponseBody
+    public Result addPatterns(String name) {
+        patternsService.addPatterns(getUser(), name);
+        return Result.success();
     }
 }

@@ -52,9 +52,9 @@ public abstract class OAuthService {
 
     //////////////////////////////////////////////////////////////
 
-    public abstract OAuthEntry getOAuthEntry();
+    public abstract OAuthEntry getOAuthEntry(String requestUrl);
 
-    public abstract User getUser(String authCode);
+    public abstract User getUser(String authCode, String requestUrl);
 
     public abstract boolean isEnabled();
 }

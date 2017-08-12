@@ -10,23 +10,33 @@ import com.hyd.hydrogenpac.beans.User;
  */
 public class AbstractController {
 
-    private String token;
+    private ThreadLocal<String> token = new ThreadLocal<>();
 
-    private User user;
+    private ThreadLocal<User> user = new ThreadLocal<>();
+
+    private ThreadLocal<String> requestUrl = new ThreadLocal<>();
 
     public String getToken() {
-        return token;
+        return token.get();
     }
 
     public void setToken(String token) {
-        this.token = token;
+        this.token.set(token);
     }
 
     public void setUser(User user) {
-        this.user = user;
+        this.user.set(user);
     }
 
     public User getUser() {
-        return user;
+        return user.get();
+    }
+
+    public String getRequestUrl() {
+        return this.requestUrl.get();
+    }
+
+    public void setRequestUrl(String uri) {
+        this.requestUrl.set(uri);
     }
 }

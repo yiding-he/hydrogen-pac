@@ -1,6 +1,7 @@
 package com.hyd.hydrogenpac.beans;
 
 import com.hyd.hydrogenpac.oauth.OAuthServiceType;
+import org.dizitart.no2.objects.Id;
 
 /**
  * (description)
@@ -10,7 +11,7 @@ import com.hyd.hydrogenpac.oauth.OAuthServiceType;
  */
 public class User {
 
-    private OAuthServiceType oAuthServiceType;
+    private OAuthServiceType type;
 
     private String username;
 
@@ -18,12 +19,23 @@ public class User {
 
     private String avatar;
 
-    public OAuthServiceType getoAuthServiceType() {
-        return oAuthServiceType;
+    @Id
+    private long userDocId;
+
+    public long getUserDocId() {
+        return userDocId;
     }
 
-    public void setoAuthServiceType(OAuthServiceType oAuthServiceType) {
-        this.oAuthServiceType = oAuthServiceType;
+    public void setUserDocId(long userDocId) {
+        this.userDocId = userDocId;
+    }
+
+    public OAuthServiceType getType() {
+        return type;
+    }
+
+    public void setType(OAuthServiceType type) {
+        this.type = type;
     }
 
     public String getUsername() {
@@ -53,7 +65,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "oAuthServiceType=" + oAuthServiceType +
+                "type=" + type +
                 ", username='" + username + '\'' +
                 ", userId='" + userId + '\'' +
                 '}';
