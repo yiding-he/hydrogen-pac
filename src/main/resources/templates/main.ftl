@@ -5,14 +5,10 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Hahaha</title>
+    <title>PAC 管理</title>
     <link rel="stylesheet" href="css/default.css">
     <script src="js/jquery-3.2.1.min.js"></script>
     <script>
-        $(function () {
-
-        });
-
         function handlePostResult(data) {
             if (!data.success) {
                 alert(data.message);
@@ -21,18 +17,12 @@
             }
         }
 
-        function addProxy() {
-            var name = prompt("Proxy Name:");
-            var value = prompt("Proxy Value:");
-            $.post("proxy/add", {name: name, value: value}, handlePostResult);
-        }
-
         function deleteProxy(name) {
             if (!confirm("Delete all proxy named '" + name + "'?")) {
                 return;
             }
 
-            $.post("proxy/delete", {name:name}, handlePostResult)
+            $.post("delete_proxy", {name:name}, handlePostResult)
         }
 
         function addPatterns() {
@@ -43,24 +33,26 @@
 </head>
 <body>
 
-<h2>Proxies</h2>
+<h2>代理配置</h2>
 
-<p><a href="javascript:addProxy()">Add Proxy</a></p>
+<p><a href="add_proxy">添加代理</a></p>
 
 <table border="1">
     <thead>
     <tr>
-        <td>Name</td>
-        <td>Value</td>
+        <td>代理名称</td>
+        <td>代理类型</td>
+        <td>服务器地址</td>
         <td>&nbsp;</td>
     </tr>
     </thead>
     <tbody>
     <#list proxies as proxy>
     <tr>
-        <td>${proxy.name}</td>
-        <td>${proxy.value}</td>
-        <td><a href="javascript:deleteProxy('${proxy.name}')">Delete</a></td>
+        <td>${proxy.proxyName}</td>
+        <td>${proxy.proxyType}</td>
+        <td>${proxy.proxyAddress}</td>
+        <td><a href="javascript:deleteProxy('${proxy.proxyName}')">删除</a></td>
     </tr>
     </#list>
     </tbody>

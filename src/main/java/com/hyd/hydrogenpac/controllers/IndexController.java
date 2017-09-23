@@ -1,6 +1,5 @@
 package com.hyd.hydrogenpac.controllers;
 
-import com.hyd.hydrogenpac.beans.Result;
 import com.hyd.hydrogenpac.beans.User;
 import com.hyd.hydrogenpac.oauth.OAuthEntry;
 import com.hyd.hydrogenpac.oauth.OAuthService;
@@ -15,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -85,26 +82,5 @@ public class IndexController extends AbstractController {
             model.addAttribute("patterns", patternsService.getPatterns(user));
             return "main";
         }
-    }
-
-    @PostMapping("/proxy/add")
-    @ResponseBody
-    public Result addProxy(String name, String value) {
-        proxyService.addProxy(getUser(), name, value);
-        return Result.success();
-    }
-
-    @PostMapping("/proxy/delete")
-    @ResponseBody
-    public Result deleteProxy(String name) {
-        proxyService.deleteProxy(getUser(), name);
-        return Result.success();
-    }
-
-    @PostMapping("/patterns/add")
-    @ResponseBody
-    public Result addPatterns(String name) {
-        patternsService.addPatterns(getUser(), name);
-        return Result.success();
     }
 }

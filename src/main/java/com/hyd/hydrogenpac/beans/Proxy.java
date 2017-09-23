@@ -8,23 +8,42 @@ package com.hyd.hydrogenpac.beans;
  */
 public class Proxy {
 
-    private String name;
+    private String proxyName;
 
-    private String value;
+    private String proxyType;
 
-    public String getName() {
-        return name;
+    private String proxyAddress;
+
+    public Proxy() {
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Proxy(String proxyName, String proxyType, String proxyAddress) {
+        this.proxyName = proxyName;
+        this.proxyType = proxyType;
+        this.proxyAddress = proxyAddress;
     }
 
-    public String getValue() {
-        return value;
+    public String getProxyName() {
+        return proxyName;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setProxyName(String proxyName) {
+        this.proxyName = proxyName;
+    }
+
+    public String getProxyType() {
+        return proxyType;
+    }
+
+    public void setProxyType(String proxyType) {
+        this.proxyType = proxyType;
+    }
+
+    public String getProxyAddress() {
+        return proxyAddress;
+    }
+
+    public void setProxyAddress(String proxyAddress) {
+        this.proxyAddress = proxyAddress;
     }
 }
