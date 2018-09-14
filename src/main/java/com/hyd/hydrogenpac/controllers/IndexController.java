@@ -1,11 +1,12 @@
 package com.hyd.hydrogenpac.controllers;
 
+import com.hyd.hydrogenpac.beans.Proxy;
 import com.hyd.hydrogenpac.beans.Result;
 import com.hyd.hydrogenpac.beans.User;
+import com.hyd.hydrogenpac.oauth.OAuthChannel;
 import com.hyd.hydrogenpac.oauth.OAuthEntry;
 import com.hyd.hydrogenpac.oauth.OAuthService;
 import com.hyd.hydrogenpac.oauth.OAuthServiceFactory;
-import com.hyd.hydrogenpac.oauth.OAuthServiceType;
 import com.hyd.hydrogenpac.services.PatternsService;
 import com.hyd.hydrogenpac.services.ProxyService;
 import com.hyd.hydrogenpac.services.UserService;
@@ -47,9 +48,9 @@ public class IndexController extends AbstractController {
     @GetMapping("/login")
     public String login(Model model) {
 
-        OAuthServiceType[] oAuthServiceTypes = OAuthServiceType.values();
+        OAuthChannel[] oAuthChannels = OAuthChannel.values();
 
-        List<OAuthEntry> entryList = Arrays.stream(oAuthServiceTypes)
+        List<OAuthEntry> entryList = Arrays.stream(oAuthChannels)
                 .map(oAuthServiceFactory::getOAuthService)
                 .filter(OAuthService::isEnabled)
                 .map(this::getOAuthEntry)
@@ -66,7 +67,7 @@ public class IndexController extends AbstractController {
     @GetMapping("/auth/callback/baidu")
     public String callbackBaidu(String code) throws IOException {
 
-        OAuthService baiduOAuthService = oAuthServiceFactory.getOAuthService(OAuthServiceType.Baidu);
+        OAuthService baiduOAuthService = oAuthServiceFactory.getOAuthService(OAuthChannel.Baidu);
         User user = baiduOAuthService.getUser(code, getRequestUrl());
 
         userService.onUserLoggedIn(user.getType(), user.getUserId(), user.getUsername(), user.getAvatar(), getToken());
@@ -105,8 +106,8 @@ public class IndexController extends AbstractController {
 
     @PostMapping("/proxy/add")
     @ResponseBody
-    public Result addProxy(String name, String value) {
-        proxyService.addProxy(getUser(), name, value);
+    public Result addProxy(String name, String type, String host, int port) {
+        proxyService.addProxy(getUser(), new Proxy(name, type, host, port));
         return Result.success();
     }
 

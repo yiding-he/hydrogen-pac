@@ -18,9 +18,9 @@ public abstract class OAuthService {
 
     private static final Logger LOG = LoggerFactory.getLogger(OAuthService.class);
 
-    private static Map<OAuthServiceType, OAuthService> serviceMappings = new HashMap<>();
+    private static Map<OAuthChannel, OAuthService> serviceMappings = new HashMap<>();
 
-    public static OAuthService getOAuthService(OAuthServiceType type) {
+    public static OAuthService getOAuthService(OAuthChannel type) {
         return serviceMappings.get(type);
     }
 
@@ -29,7 +29,7 @@ public abstract class OAuthService {
         register();
     }
 
-    protected OAuthServiceType getType() {
+    protected OAuthChannel getOauthChannel() {
         Class<? extends OAuthService> type = this.getClass();
 
         if (!type.isAnnotationPresent(OAuth.class)) {
@@ -40,7 +40,7 @@ public abstract class OAuthService {
     }
 
     private void register() {
-        OAuthServiceType type = getType();
+        OAuthChannel type = getOauthChannel();
 
         if (type == null) {
             LOG.error(getClass() + " is not annotated with @OAuth!");

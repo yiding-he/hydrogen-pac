@@ -8,7 +8,7 @@ package com.hyd.hydrogenpac.oauth;
  */
 public class OAuthEntry {
 
-    private OAuthServiceType type;
+    private OAuthChannel type;
 
     private String loginUrl;
 
@@ -17,17 +17,17 @@ public class OAuthEntry {
     public OAuthEntry() {
     }
 
-    public OAuthEntry(OAuthServiceType type, String loginUrl, String callbackUrl) {
+    public OAuthEntry(OAuthChannel type, String loginUrl, String callbackUrl) {
         this.type = type;
         this.loginUrl = loginUrl;
         this.callbackUrl = callbackUrl;
     }
 
-    public OAuthServiceType getType() {
+    public OAuthChannel getType() {
         return type;
     }
 
-    public void setType(OAuthServiceType type) {
+    public void setType(OAuthChannel type) {
         this.type = type;
     }
 

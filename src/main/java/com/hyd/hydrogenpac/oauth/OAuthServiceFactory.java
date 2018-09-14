@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class OAuthServiceFactory {
 
-    public OAuthService getOAuthService(OAuthServiceType type) {
+    public OAuthService getOAuthService(OAuthChannel type) {
         return OAuthService.getOAuthService(type);
     }
 }

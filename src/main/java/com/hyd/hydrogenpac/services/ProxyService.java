@@ -19,10 +19,7 @@ public class ProxyService extends AbstractService {
     }
 
     private Proxy parse(Document document) {
-        Proxy proxy = new Proxy();
-        proxy.setName(document.get("name", String.class));
-        proxy.setValue(document.get("value", String.class));
-        return proxy;
+        return mapper.asObject(document, Proxy.class);
     }
 
     public List<Proxy> getProxies(User user) {
@@ -38,16 +35,13 @@ public class ProxyService extends AbstractService {
                 .collect(Collectors.toList());
     }
 
-    public void addProxy(User user, String name, String value) {
+    public void addProxy(User user, Proxy proxy) {
         if (user == null) {
             return;
         }
 
-        getProxyCollection().insert(new Document()
-                .put("userId", user.getUserId())
-                .put("name", name)
-                .put("value", value)
-        );
+        Document proxyDoc = mapper.asDocument(proxy).put("userId", user.getUserId());
+        getProxyCollection().insert(proxyDoc);
     }
 
     public void deleteProxy(User user, String name) {

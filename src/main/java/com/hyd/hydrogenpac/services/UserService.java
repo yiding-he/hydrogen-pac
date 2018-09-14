@@ -1,9 +1,8 @@
 package com.hyd.hydrogenpac.services;
 
-import com.hyd.hydrogenpac.beans.Token;
 import com.hyd.hydrogenpac.beans.User;
 import com.hyd.hydrogenpac.config.CookieConfig;
-import com.hyd.hydrogenpac.oauth.OAuthServiceType;
+import com.hyd.hydrogenpac.oauth.OAuthChannel;
 import org.dizitart.no2.objects.ObjectRepository;
 import org.dizitart.no2.objects.filters.ObjectFilters;
 import org.slf4j.Logger;
@@ -36,10 +35,9 @@ public class UserService extends AbstractService {
         nitrite.getCollection("users").find().forEach(doc -> LOG.info(doc.toString()));
     }
 
-    public User getLoggedInUser(String token) {
-        return tokenService.getAvailableToken(token)
-                .map(Token::getUserDocId)
-                .map(this::getUserByDocId)
+    public User getLoggedInUser(String tokenString) {
+        return tokenService.getAvailableToken(tokenString)
+                .map(token -> getUserById(token.getOauthChannel(), token.getUserId()))
                 .orElse(null);
     }
 
@@ -49,20 +47,20 @@ public class UserService extends AbstractService {
                 .firstOrDefault();
     }
 
-    public void onUserLoggedIn(OAuthServiceType type, String userId, String username, String avatar, String token) {
+    public void onUserLoggedIn(OAuthChannel type, String userId, String username, String avatar, String token) {
 
         User user = getUserById(type, userId);
         if (user == null) {
             user = createUser(type, userId, username, avatar);
         }
 
-        tokenService.saveToken(token, user.getUserDocId());
+        tokenService.saveToken(token, user.getUserId());
     }
 
-    private User createUser(OAuthServiceType type, String userId, String username, String avatar) {
+    private User createUser(OAuthChannel oAuthChannel, String userId, String username, String avatar) {
         User user = new User();
         user.setUserId(userId);
-        user.setType(type);
+        user.setOauthChannel(oAuthChannel);
         user.setAvatar(avatar);
         user.setUsername(username);
 
@@ -70,7 +68,7 @@ public class UserService extends AbstractService {
         return user;
     }
 
-    private User getUserById(OAuthServiceType type, String userId) {
+    private User getUserById(OAuthChannel type, String userId) {
         return getUserRepository().find(and(
                 ObjectFilters.eq("type", type.name()),
                 ObjectFilters.eq("userId", userId)

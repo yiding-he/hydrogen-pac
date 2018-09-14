@@ -19,7 +19,7 @@ import java.io.IOException;
  * @author yidin
  */
 @Component
-@OAuth(type = OAuthServiceType.Baidu)
+@OAuth(type = OAuthChannel.Baidu)
 public class BaiduOAuthService extends OAuthService {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaiduOAuthService.class);
@@ -51,7 +51,7 @@ public class BaiduOAuthService extends OAuthService {
         String callbackUrl = getCallbackUrl(requestUrl);
         String loginUrl = getLoginUrl(callbackUrl);
 
-        return new OAuthEntry(getType(), loginUrl, callbackUrl);
+        return new OAuthEntry(getOauthChannel(), loginUrl, callbackUrl);
     }
 
     private String getLoginUrl(String callbackUrl) {
@@ -72,7 +72,7 @@ public class BaiduOAuthService extends OAuthService {
         JSONObject baiduUserInfo = getBaiduUserInfo(accessToken);
 
         User user = new User();
-        user.setType(getType());
+        user.setOauthChannel(getOauthChannel());
         user.setUserId(baiduUserInfo.getString("uid"));
         user.setUsername(baiduUserInfo.getString("uname"));
         user.setAvatar(AVATAR_URL_PATTERN.replace("${portrait}", baiduUserInfo.getString("portrait")));

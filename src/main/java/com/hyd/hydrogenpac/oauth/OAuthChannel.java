@@ -1,13 +1,13 @@
 package com.hyd.hydrogenpac.oauth;
 
-public enum OAuthServiceType {
+public enum OAuthChannel {
 
     Baidu("百度")
 
     ;
     private String name;
 
-    OAuthServiceType(String name) {
+    OAuthChannel(String name) {
         this.name = name;
     }
 

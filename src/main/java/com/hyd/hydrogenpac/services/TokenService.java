@@ -37,12 +37,12 @@ public class TokenService extends AbstractService {
         );
     }
 
-    public void saveToken(String tokenString, long userDocId) {
+    public void saveToken(String tokenString, String userId) {
         long tokenExpire = System.currentTimeMillis() / 1000 + cookieConfig.getExpiry();
 
         Token token = new Token();
         token.setToken(tokenString);
-        token.setUserDocId(userDocId);
+        token.setUserId(userId);
         token.setExpiration(tokenExpire);
 
         getTokenRepository().insert(token);

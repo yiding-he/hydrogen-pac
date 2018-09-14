@@ -1,30 +1,19 @@
 package com.hyd.hydrogenpac.beans;
 
-/**
- * (description)
- * created at 2017/8/12
- *
- * @author yidin
- */
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Proxy {
 
     private String name;
 
-    private String value;
+    private String type;
 
-    public String getName() {
-        return name;
-    }
+    private String host;
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
+    private int port;
 }
