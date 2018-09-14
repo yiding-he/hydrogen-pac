@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -72,7 +73,12 @@ public class IndexController extends AbstractController {
         return "redirect:../../main";
     }
 
-    @GetMapping(value = {"/", "/main"})
+    @GetMapping({"", "/"})
+    public String index0() {
+        return "redirect:main";
+    }
+
+    @GetMapping(value = {"/main"})
     public String index(Model model) {
         User user = getUser();
 
@@ -85,6 +91,16 @@ public class IndexController extends AbstractController {
             model.addAttribute("patterns", patternsService.getPatterns(user));
             return "main";
         }
+    }
+
+    @GetMapping("/proxy/add")
+    public ModelAndView addProxy() {
+        return new ModelAndView("proxy_info").addObject("title", "Add Proxy").addObject("action", "add");
+    }
+
+    @GetMapping("/proxy/edit")
+    public ModelAndView editProxy() {
+        return new ModelAndView("proxy_info").addObject("title", "Edit Proxy").addObject("action", "edit");
     }
 
     @PostMapping("/proxy/add")

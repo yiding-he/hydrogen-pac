@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 public class NitriteWrapper {
 
     @Autowired
-    DbConfig dbConfig;
+    private DbConfig dbConfig;
 
     private Nitrite nitrite;
 

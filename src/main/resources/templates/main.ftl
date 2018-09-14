@@ -45,7 +45,7 @@
 
 <h2>Proxies</h2>
 
-<p><a href="javascript:addProxy()">Add Proxy</a></p>
+<p><a href="proxy/add">Add Proxy</a></p>
 
 <table border="1">
     <thead>

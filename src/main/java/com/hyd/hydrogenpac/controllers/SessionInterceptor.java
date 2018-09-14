@@ -45,12 +45,14 @@ public class SessionInterceptor implements HandlerInterceptor {
                     "token", token, cookieConfig.getDomain(), cookieConfig.getExpiry()));
         }
 
-        Object controller = ((HandlerMethod) o).getBean();
-        if (controller instanceof AbstractController) {
-            AbstractController c = (AbstractController) controller;
-            c.setToken(token);
-            c.setUser(userService.getLoggedInUser(token));
-            c.setRequestUrl(request.getRequestURL().toString());
+        if (o instanceof HandlerMethod) {
+            Object controller = ((HandlerMethod) o).getBean();
+            if (controller instanceof AbstractController) {
+                AbstractController c = (AbstractController) controller;
+                c.setToken(token);
+                c.setUser(userService.getLoggedInUser(token));
+                c.setRequestUrl(request.getRequestURL().toString());
+            }
         }
 
         return true;
