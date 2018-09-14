@@ -47,14 +47,8 @@ public class UserService extends AbstractService {
                 .firstOrDefault();
     }
 
-    public void onUserLoggedIn(OAuthChannel type, String userId, String username, String avatar, String token) {
-
-        User user = getUserById(type, userId);
-        if (user == null) {
-            user = createUser(type, userId, username, avatar);
-        }
-
-        tokenService.saveToken(token, user.getUserId());
+    public void onUserLoggedIn(User user, String token) {
+        tokenService.saveToken(token, user.getUserId(), user.getOauthChannel());
     }
 
     private User createUser(OAuthChannel oAuthChannel, String userId, String username, String avatar) {

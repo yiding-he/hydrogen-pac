@@ -2,6 +2,7 @@ package com.hyd.hydrogenpac.services;
 
 import com.hyd.hydrogenpac.beans.Token;
 import com.hyd.hydrogenpac.config.CookieConfig;
+import com.hyd.hydrogenpac.oauth.OAuthChannel;
 import org.dizitart.no2.objects.ObjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,12 +38,13 @@ public class TokenService extends AbstractService {
         );
     }
 
-    public void saveToken(String tokenString, String userId) {
+    public void saveToken(String tokenString, String userId, OAuthChannel channel) {
         long tokenExpire = System.currentTimeMillis() / 1000 + cookieConfig.getExpiry();
 
         Token token = new Token();
         token.setToken(tokenString);
         token.setUserId(userId);
+        token.setOauthChannel(channel);
         token.setExpiration(tokenExpire);
 
         getTokenRepository().insert(token);

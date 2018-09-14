@@ -70,7 +70,7 @@ public class IndexController extends AbstractController {
         OAuthService baiduOAuthService = oAuthServiceFactory.getOAuthService(OAuthChannel.Baidu);
         User user = baiduOAuthService.getUser(code, getRequestUrl());
 
-        userService.onUserLoggedIn(user.getType(), user.getUserId(), user.getUsername(), user.getAvatar(), getToken());
+        userService.onUserLoggedIn(user, getToken());
         return "redirect:../../main";
     }
 
