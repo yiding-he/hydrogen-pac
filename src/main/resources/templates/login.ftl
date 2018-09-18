@@ -13,6 +13,10 @@
 </head>
 <body>
 
+<#if !loginEntries?has_content>
+    <p><a href="login_no_entry">登录</a></p>
+</#if>
+
 <#list loginEntries as entry>
 <p><a href="${entry.loginUrl}">使用${entry.getType().getName()}账号登录</a></p>
 </#list>

@@ -14,5 +14,5 @@ public class User {
 
     private String oauthUserId;
 
-    private OAuthChannel oauthChannel;
+    private OAuthChannel oauthChannel = OAuthChannel.None;
 }

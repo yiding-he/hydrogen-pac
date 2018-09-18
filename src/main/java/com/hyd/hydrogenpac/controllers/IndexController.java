@@ -94,6 +94,15 @@ public class IndexController extends AbstractController {
         }
     }
 
+    @GetMapping("login_no_entry")
+    public String loginNoEntry() {
+        User user = new User();
+        user.setUserId("anonymous");
+        user.setUsername("anonymous");
+        userService.onUserLoggedIn(user, getToken());
+        return "redirect:main";
+    }
+
     @GetMapping("/proxy/add")
     public ModelAndView addProxy() {
         return new ModelAndView("proxy_info").addObject("title", "Add Proxy").addObject("action", "add");

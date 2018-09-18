@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "nitrite")
 public class DbConfig {
 
-    private String path;
+    private String path = "target/db/hydrogen-pac";
 
     public String getPath() {
         return path;

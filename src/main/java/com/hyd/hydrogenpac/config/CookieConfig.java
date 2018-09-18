@@ -5,9 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "cookie")
 public class CookieConfig {
 
-    private String domain;  // optional
+    private String domain = "localhost";
 
-    private int expiry;     // in seconds
+    private int expiry = 3600;
 
     public String getDomain() {
         return domain;
