@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,4 +58,6 @@ public abstract class OAuthService {
     public abstract User getUser(String authCode, String requestUrl);
 
     public abstract boolean isEnabled();
+
+    public abstract String readCode(HttpServletRequest request);
 }

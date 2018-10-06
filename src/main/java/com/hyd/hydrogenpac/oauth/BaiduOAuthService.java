@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
@@ -43,6 +44,11 @@ public class BaiduOAuthService extends OAuthService {
                 authConfig.getBaiduApiKey(),
                 authConfig.getBaiduApiSecret()
         );
+    }
+
+    @Override
+    public String readCode(HttpServletRequest request) {
+        return request.getParameter("code");
     }
 
     @Override

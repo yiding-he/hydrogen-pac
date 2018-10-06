@@ -3,6 +3,7 @@ package com.hyd.hydrogenpac.services;
 import com.hyd.hydrogenpac.beans.User;
 import com.hyd.hydrogenpac.config.CookieConfig;
 import com.hyd.hydrogenpac.oauth.OAuthChannel;
+import org.dizitart.no2.objects.Cursor;
 import org.dizitart.no2.objects.ObjectRepository;
 import org.dizitart.no2.objects.filters.ObjectFilters;
 import org.slf4j.Logger;
@@ -11,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 import static org.dizitart.no2.objects.filters.ObjectFilters.and;
-import static org.dizitart.no2.objects.filters.ObjectFilters.eq;
 
 /**
  * @author yiding.he
@@ -37,34 +38,25 @@ public class UserService extends AbstractService {
 
     public User getLoggedInUser(String tokenString) {
         return tokenService.getAvailableToken(tokenString)
-                .map(token -> getUserById(token.getOauthChannel(), token.getUserId()))
+                .map(token -> findById(token.getOauthChannel(), token.getUserId()))
                 .orElse(null);
     }
 
-    private User getUserByDocId(long userDocId) {
-        return getUserRepository()
-                .find(eq("userDocId", userDocId))
-                .firstOrDefault();
-    }
-
     public void onUserLoggedIn(User user, String token) {
+        saveUser(user);
         tokenService.saveToken(token, user.getUserId(), user.getOauthChannel());
     }
 
-    private User createUser(OAuthChannel oAuthChannel, String userId, String username, String avatar) {
-        User user = new User();
-        user.setUserId(userId);
-        user.setOauthChannel(oAuthChannel);
-        user.setAvatar(avatar);
-        user.setUsername(username);
-
-        getUserRepository().insert(user);
-        return user;
+    public void saveUser(User user) {
+        User userById = findById(user.getOauthChannel(), user.getUserId());
+        if (userById == null) {
+            getUserRepository().insert(user);
+        }
     }
 
-    private User getUserById(OAuthChannel type, String userId) {
+    public User findById(OAuthChannel channel, String userId) {
         return getUserRepository().find(and(
-                ObjectFilters.eq("type", type.name()),
+                ObjectFilters.eq("oauthChannel", channel.name()),
                 ObjectFilters.eq("userId", userId)
         )).firstOrDefault();
     }
@@ -76,5 +68,10 @@ public class UserService extends AbstractService {
             userObjectRepository = nitrite.getRepository(User.class);
         }
         return userObjectRepository;
+    }
+
+    public List<User> findAll() {
+        Cursor<User> users = getUserRepository().find();
+        return users.toList();
     }
 }

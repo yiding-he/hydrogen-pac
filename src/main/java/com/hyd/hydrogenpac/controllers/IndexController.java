@@ -16,11 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,11 +65,16 @@ public class IndexController extends AbstractController {
         return oAuthService.getOAuthEntry(getRequestUrl());
     }
 
-    @GetMapping("/auth/callback/baidu")
-    public String callbackBaidu(String code) throws IOException {
+    @GetMapping("/auth/callback/{channel}")
+    public String callbackBaidu(
+            @PathVariable String channel,
+            HttpServletRequest request
+    ) {
 
-        OAuthService baiduOAuthService = oAuthServiceFactory.getOAuthService(OAuthChannel.Baidu);
-        User user = baiduOAuthService.getUser(code, getRequestUrl());
+        OAuthChannel oAuthChannel = OAuthChannel.valueOf(channel);
+        OAuthService oAuthService = oAuthServiceFactory.getOAuthService(oAuthChannel);
+        String code = oAuthService.readCode(request);
+        User user = oAuthService.getUser(code, getRequestUrl());
 
         userService.onUserLoggedIn(user, getToken());
         return "redirect:../../main";
