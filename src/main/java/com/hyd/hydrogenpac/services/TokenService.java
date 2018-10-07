@@ -3,7 +3,6 @@ package com.hyd.hydrogenpac.services;
 import com.hyd.hydrogenpac.beans.Token;
 import com.hyd.hydrogenpac.config.CookieConfig;
 import com.hyd.hydrogenpac.oauth.OAuthChannel;
-import org.dizitart.no2.objects.ObjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,24 +11,20 @@ import java.util.Optional;
 import static org.dizitart.no2.objects.filters.ObjectFilters.*;
 
 @Service
-public class TokenService extends AbstractService {
+public class TokenService extends AbstractService<Token> {
 
     @Autowired
     CookieConfig cookieConfig;
 
-    private ObjectRepository<Token> tokenObjectRepository;
-
-    private ObjectRepository<Token> getTokenRepository() {
-        if (tokenObjectRepository == null) {
-            tokenObjectRepository = nitrite.getRepository(Token.class);
-        }
-        return tokenObjectRepository;
+    @Override
+    protected Class<Token> getRepositoryType() {
+        return Token.class;
     }
 
     public Optional<Token> getAvailableToken(String tokenString) {
         long currentTime = System.currentTimeMillis() / 1000;
 
-        return Optional.ofNullable(getTokenRepository()
+        return Optional.ofNullable(repository
                 .find(and(
                         eq("token", tokenString),
                         gt("expiration", currentTime)
@@ -47,6 +42,6 @@ public class TokenService extends AbstractService {
         token.setOauthChannel(channel);
         token.setExpiration(tokenExpire);
 
-        getTokenRepository().insert(token);
+        repository.insert(token);
     }
 }

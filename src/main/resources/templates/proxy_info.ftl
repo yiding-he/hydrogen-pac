@@ -6,16 +6,28 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Hahaha</title>
-    <link rel="stylesheet" href="css/default.css">
-    <script src="js/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="../css/default.css">
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/default.js"></script>
     <script>
+        $(function () {
+            var params = urlParams();
+            if (params['error']) {
+                $.get('../get_error', {error: params['error']}, function(result) {
+                    if (result.success) {
+                        var errorMessage = result.data.message;
+                        $('#add_proxy_form').prepend($('<div class="error">').html(errorMessage));
+                    }
+                });
+            }
+        });
     </script>
 </head>
 <body>
 
 <h2>${title!}</h2>
 
-<form action="${action!}" method="post">
+<form action="${action!}" method="post" id="add_proxy_form">
     <table>
         <tr>
             <td>Name</td>

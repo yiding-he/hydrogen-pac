@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Proxy {
 
+    private String userId;
+
     private String name;
 
     private String type;

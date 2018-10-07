@@ -8,7 +8,12 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class PatternsService extends AbstractService {
+public class PatternsService extends AbstractService<Patterns> {
+
+    @Override
+    protected Class<Patterns> getRepositoryType() {
+        return Patterns.class;
+    }
 
     public List<Patterns> getPatterns(User user) {
         return Collections.emptyList();

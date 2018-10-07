@@ -1,17 +1,25 @@
 package com.hyd.hydrogenpac.services;
 
 import org.dizitart.no2.Nitrite;
-import org.dizitart.no2.mapper.JacksonMapper;
-import org.dizitart.no2.mapper.NitriteMapper;
+import org.dizitart.no2.objects.ObjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
 
 /**
  * @author yiding.he
  */
-public abstract class AbstractService {
+public abstract class AbstractService<T> {
 
     @Autowired
-    Nitrite nitrite;
+    protected Nitrite nitrite;
 
-    protected NitriteMapper mapper = new JacksonMapper();
+    ObjectRepository<T> repository;
+
+    protected abstract Class<T> getRepositoryType();
+
+    @PostConstruct
+    protected void init() {
+        this.repository = nitrite.getRepository(getRepositoryType());
+    }
 }

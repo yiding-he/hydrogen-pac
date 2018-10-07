@@ -2,56 +2,50 @@ package com.hyd.hydrogenpac.services;
 
 import com.hyd.hydrogenpac.beans.Proxy;
 import com.hyd.hydrogenpac.beans.User;
-import org.dizitart.no2.Document;
-import org.dizitart.no2.NitriteCollection;
-import org.dizitart.no2.filters.Filters;
+import org.dizitart.no2.objects.ObjectFilter;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static org.dizitart.no2.objects.filters.ObjectFilters.and;
+import static org.dizitart.no2.objects.filters.ObjectFilters.eq;
 
 @Service
-public class ProxyService extends AbstractService {
+public class ProxyService extends AbstractService<Proxy> {
 
-    private NitriteCollection getProxyCollection() {
-        return nitrite.getCollection("proxies");
+    @Override
+    protected Class<Proxy> getRepositoryType() {
+        return Proxy.class;
     }
 
-    private Proxy parse(Document document) {
-        return mapper.asObject(document, Proxy.class);
-    }
-
-    public List<Proxy> getProxies(User user) {
+    public List<Proxy> findProxies(User user) {
 
         if (user == null) {
             return Collections.emptyList();
         }
 
-        return getProxyCollection()
-                .find(Filters.eq("userId", user.getUserId()))
-                .toList().stream()
-                .map(this::parse)
-                .collect(Collectors.toList());
+        return repository
+                .find(eq("userId", user.getUserId()))
+                .toList();
     }
 
-    public void addProxy(User user, Proxy proxy) {
-        if (user == null) {
-            return;
-        }
-
-        Document proxyDoc = mapper.asDocument(proxy).put("userId", user.getUserId());
-        getProxyCollection().insert(proxyDoc);
+    public Proxy findProxyByName(String userId, String proxyName) {
+        final ObjectFilter filter = and(
+                eq("userId", userId),
+                eq("name", proxyName)
+        );
+        return repository.find(filter).firstOrDefault();
     }
 
-    public void deleteProxy(User user, String name) {
-        if (user == null) {
-            return;
-        }
+    public void addProxy(Proxy proxy) {
+        repository.insert(proxy);
+    }
 
-        getProxyCollection().remove(Filters.and(
-                Filters.eq("userId", user.getUserId()),
-                Filters.eq("name", name)
+    public void deleteProxy(String userId, String proxyName) {
+        repository.remove(and(
+                eq("userId", userId),
+                eq("name", proxyName)
         ));
     }
 }

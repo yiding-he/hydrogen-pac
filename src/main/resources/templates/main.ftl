@@ -51,7 +51,9 @@
     <thead>
     <tr>
         <td>Name</td>
-        <td>Value</td>
+        <td>Type</td>
+        <td>Host</td>
+        <td>Port</td>
         <td>&nbsp;</td>
     </tr>
     </thead>
@@ -59,7 +61,9 @@
     <#list proxies as proxy>
     <tr>
         <td>${proxy.name}</td>
-        <td>${proxy.value}</td>
+        <td>${proxy.type}</td>
+        <td>${proxy.host}</td>
+        <td>${proxy.port?string["#"]}</td>
         <td><a href="javascript:deleteProxy('${proxy.name}')">Delete</a></td>
     </tr>
     </#list>

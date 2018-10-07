@@ -1,5 +1,6 @@
 package com.hyd.hydrogenpac.controllers;
 
+import com.hyd.hydrogenpac.Errors;
 import com.hyd.hydrogenpac.beans.Proxy;
 import com.hyd.hydrogenpac.beans.Result;
 import com.hyd.hydrogenpac.beans.User;
@@ -94,10 +95,16 @@ public class IndexController extends AbstractController {
             return "redirect:login";
         } else {
             model.addAttribute("user", user);
-            model.addAttribute("proxies", proxyService.getProxies(user));
+            model.addAttribute("proxies", proxyService.findProxies(user));
             model.addAttribute("patterns", patternsService.getPatterns(user));
             return "main";
         }
+    }
+
+    @GetMapping("get_error")
+    @ResponseBody
+    public Result getErrorMessage(String error) {
+        return Result.success().put("message", Errors.getErrorMessage(error));
     }
 
     @GetMapping("login_no_entry")
@@ -120,16 +127,21 @@ public class IndexController extends AbstractController {
     }
 
     @PostMapping("/proxy/add")
-    @ResponseBody
-    public Result addProxy(String name, String type, String host, int port) {
-        proxyService.addProxy(getUser(), new Proxy(name, type, host, port));
-        return Result.success();
+    public ModelAndView addProxy(String name, String type, String host, int port) {
+        if (proxyService.findProxyByName(getUser().getUserId(), name) != null) {
+            return new ModelAndView("redirect:/proxy/add?error=1");
+        }
+
+        String userId = getUser().getUserId();
+        proxyService.addProxy(new Proxy(userId, name, type, host, port));
+        return new ModelAndView("redirect:/main");
     }
 
     @PostMapping("/proxy/delete")
     @ResponseBody
     public Result deleteProxy(String name) {
-        proxyService.deleteProxy(getUser(), name);
+        final String userId = getUser().getUserId();
+        proxyService.deleteProxy(userId, name);
         return Result.success();
     }
 
