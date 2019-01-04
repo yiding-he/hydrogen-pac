@@ -8,13 +8,16 @@
     <title>PAC Manager</title>
     <link rel="stylesheet" href="css/default.css">
     <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/current-pac.js"></script>
     <script>
-        $(function() {
-            $(document.body).html('<h1>It works!</h1>');
-        });
+        var testUrl = function () {
+            var url = $('#url').val();
+            alert(FindProxyForURL(url));
+        };
     </script>
 </head>
 <body>
-
+<input type="text" name="url" id="url">
+<button onclick="testUrl()">test</button>
 </body>
 </html>
