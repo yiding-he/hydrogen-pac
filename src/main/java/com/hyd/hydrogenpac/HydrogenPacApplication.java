@@ -3,18 +3,22 @@ package com.hyd.hydrogenpac;
 import com.hyd.fx.Fxml;
 import com.hyd.fx.app.AppLogo;
 import com.hyd.fx.app.AppPrimaryStage;
+import com.hyd.fx.dialog.FileDialog;
+import com.hyd.hydrogenpac.model.Configuration;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
 public class HydrogenPacApplication extends Application {
 
     public static final Properties APP = new Properties();
+
+    private static Configuration configuration = new Configuration();
 
     static {
         try {
@@ -24,13 +28,22 @@ public class HydrogenPacApplication extends Application {
         }
     }
 
+    public static Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public static void setConfiguration(Configuration configuration) {
+        HydrogenPacApplication.configuration = configuration;
+    }
+
     public void start(Stage primaryStage) throws Exception {
+        FileDialog.setInitDirectory(new File("."));
         AppPrimaryStage.setPrimaryStage(primaryStage);
         AppLogo.setPath("/logo.png");
         AppLogo.setStageLogo(primaryStage);
 
         FXMLLoader fxmlLoader = Fxml.load("/fxml/main.fxml");
-        primaryStage.setScene(new Scene((Parent) fxmlLoader.getRoot()));
+        primaryStage.setScene(new Scene(fxmlLoader.getRoot()));
         primaryStage.setTitle(APP.getProperty("title", "PAC 编辑器"));
         primaryStage.show();
     }

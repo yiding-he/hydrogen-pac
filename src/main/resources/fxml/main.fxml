@@ -1,9 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.hyd.hydrogenpac.MainController"
-            prefHeight="400.0" prefWidth="600.0">
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="com.hyd.hydrogenpac.controller.MainController"
+        prefHeight="500.0" prefWidth="700.0">
 
-</AnchorPane>
+    <top>
+        <MenuBar>
+            <Menu text="文件">
+                <MenuItem text="打开..." accelerator="Shortcut+O" onAction="#openFileClicked"/>
+                <MenuItem text="保存" accelerator="Shortcut+S" onAction="#saveFileClicked"/>
+                <MenuItem text="另存为..." onAction="#saveAsClicked"/>
+            </Menu>
+        </MenuBar>
+    </top>
+
+    <center>
+        <TabPane tabMinWidth="50">
+            <Tab text="代理" closable="false">
+                <VBox spacing="7">
+                    <padding>
+                        <Insets topRightBottomLeft="7"/>
+                    </padding>
+                    <TableView VBox.vgrow="ALWAYS" fx:id="tblProxy"/>
+                    <HBox spacing="7">
+                        <Button text="添加..." onAction="#addProxyClicked"/>
+                        <Button text="删除"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+            <Tab text="模板列表" closable="false">
+                <SplitPane dividerPositions="0.35">
+                    <VBox spacing="7">
+                        <padding>
+                            <Insets topRightBottomLeft="7"/>
+                        </padding>
+                        <Label text="列表（越靠前优先级越高）"/>
+                        <ListView VBox.vgrow="ALWAYS" editable="true"/>
+                        <HBox spacing="7">
+                            <Button text="添加"/>
+                            <Button text="删除"/>
+                            <Button text="上移"/>
+                            <Button text="下移"/>
+                        </HBox>
+                    </VBox>
+                    <VBox spacing="7">
+                        <padding>
+                            <Insets topRightBottomLeft="7"/>
+                        </padding>
+                        <Label text="列表内容"/>
+                        <ListView VBox.vgrow="ALWAYS" editable="true"/>
+                        <HBox spacing="7">
+                            <Button text="添加"/>
+                            <Button text="删除"/>
+                        </HBox>
+                    </VBox>
+                </SplitPane>
+            </Tab>
+        </TabPane>
+    </center>
+
+</BorderPane>

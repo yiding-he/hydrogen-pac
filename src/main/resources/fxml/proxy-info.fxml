@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.hyd.hydrogenpac.controller.ProxyInfoController"
+      prefWidth="300.0" spacing="7">
+
+    <HBox spacing="7" alignment="BASELINE_LEFT">
+        <Label text="名称：" minWidth="50"/>
+        <TextField fx:id="txtName" HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <HBox spacing="7" alignment="BASELINE_LEFT">
+        <Label text="主机：" minWidth="50"/>
+        <TextField fx:id="txtHost" HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <HBox spacing="7" alignment="BASELINE_LEFT">
+        <Label text="主机：" minWidth="50"/>
+        <Spinner fx:id="spnPort" prefWidth="150" min="0" max="65535"/>
+    </HBox>
+</VBox>

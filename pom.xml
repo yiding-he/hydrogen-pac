@@ -15,25 +15,36 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
+
+        <!-- dependency versions-->
         <fastjson.version>1.2.49</fastjson.version>
+        <junit.version>4.12</junit.version>
+        <hydrogen-fx.version>1.0-SNAPSHOT</hydrogen-fx.version>
+        <lombok.version>1.18.4</lombok.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.hyd</groupId>
             <artifactId>hydrogen-fx</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
+            <version>${hydrogen-fx.version}</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>${fastjson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
         </dependency>
     </dependencies>
 
