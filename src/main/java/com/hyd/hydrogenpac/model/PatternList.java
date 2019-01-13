@@ -10,21 +10,22 @@ public class PatternList {
 
     private StringProperty name = new SimpleStringProperty();
 
-    private ObservableList<String> pattens = FXCollections.observableArrayList();
+    private ObservableList<String> patterns = FXCollections.observableArrayList();
 
     private StringProperty proxyName = new SimpleStringProperty();
 
     public static PatternList parse(JSONObject patternListObj) {
         PatternList patternList = new PatternList();
         patternList.setName(patternListObj.getString("name"));
-        patternList.getPattens().addAll(patternListObj.getJSONArray("patterns").toJavaList(String.class));
+        patternList.setProxyName(patternListObj.getString("proxyName"));
+        patternList.getPatterns().addAll(patternListObj.getJSONArray("patterns").toJavaList(String.class));
         return patternList;
     }
 
     public static void copyPropsTo(PatternList p1, PatternList p2) {
         p2.setName(p1.getName());
         p2.setProxyName(p1.getProxyName());
-        p2.setPattens(p1.getPattens());
+        p2.setPatterns(p1.getPatterns());
     }
 
     public static PatternList cloneOf(PatternList patternList) {
@@ -45,12 +46,12 @@ public class PatternList {
         this.name.set(name);
     }
 
-    public ObservableList<String> getPattens() {
-        return pattens;
+    public ObservableList<String> getPatterns() {
+        return patterns;
     }
 
-    public void setPattens(ObservableList<String> pattens) {
-        this.pattens = pattens;
+    public void setPatterns(ObservableList<String> patterns) {
+        this.patterns = patterns;
     }
 
     public String getProxyName() {
