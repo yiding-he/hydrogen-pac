@@ -2,16 +2,20 @@ package com.hyd.hydrogenpac.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.hyd.fx.app.AppLogo;
+import com.hyd.fx.builders.ListViewBuilder;
 import com.hyd.fx.builders.TableViewBuilder;
 import com.hyd.fx.dialog.DialogBuilder;
 import com.hyd.fx.dialog.FileDialog;
 import com.hyd.fx.system.ZipFileCreator;
 import com.hyd.fx.system.ZipFileReader;
 import com.hyd.hydrogenpac.HydrogenPacApplication;
+import com.hyd.hydrogenpac.helper.DisplayTextHelper;
 import com.hyd.hydrogenpac.model.Configuration;
 import com.hyd.hydrogenpac.model.EntryNames;
+import com.hyd.hydrogenpac.model.PatternList;
 import com.hyd.hydrogenpac.model.Proxy;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
 
 import java.io.File;
@@ -27,6 +31,8 @@ public class MainController {
 
     public TableView<Proxy> tblProxy;
 
+    public ListView<PatternList> lvPatternList;
+
     public void initialize() {
 
         TableViewBuilder.of(tblProxy)
@@ -35,11 +41,16 @@ public class MainController {
                 .addIntPropertyColumn("端口", proxy -> proxy.portProperty().asObject())
                 .setOnItemDoubleClick(this::editProxy);
 
+        ListViewBuilder.of(lvPatternList)
+                .setOnItemDoubleClick(this::editPatternList)
+                .setStringFunction(DisplayTextHelper::getDisplayText);
+
         loadConfiguration(HydrogenPacApplication.getConfiguration());
     }
 
     private void loadConfiguration(Configuration configuration) {
         this.tblProxy.setItems(configuration.getProxyList());
+        this.lvPatternList.setItems(configuration.getPatternLists());
     }
 
 
@@ -73,6 +84,8 @@ public class MainController {
         creator.putEntry(EntryNames.CONFIGURATION, json, "UTF-8");
         creator.close();
     }
+
+    ////////////////////////////////////////////////////////////// PROXY
 
     public void addProxyClicked() {
         ProxyInfoController controller = new ProxyInfoController();
@@ -109,5 +122,53 @@ public class MainController {
 
     private void editProxyApply(Proxy proxy, Proxy clone) {
         Proxy.copyPropsTo(clone, proxy);
+    }
+
+    ////////////////////////////////////////////////////////////// PATTERN LIST
+
+    public void addPatternListClicked() {
+        PatternListInfoController controller = new PatternListInfoController();
+        controller.setPatternList(new PatternList());
+
+        new DialogBuilder()
+                .title("新建模板列表")
+                .logo(AppLogo.getLogo())
+                .body("/fxml/pattern-list-info.fxml", controller)
+                .buttons(ButtonType.OK, ButtonType.CANCEL)
+                .onOkButtonClicked(e -> this.addPatternListApply(controller.getPatternList()))
+                .showAndWait();
+    }
+
+    private void addPatternListApply(PatternList patternList) {
+        if (patternList != null) {
+            this.lvPatternList.getItems().add(patternList);
+        }
+    }
+
+    private void editPatternList(PatternList patternList) {
+        if (patternList == null) {
+            return;
+        }
+
+        PatternListInfoController controller = new PatternListInfoController();
+        PatternList clone = PatternList.cloneOf(patternList);
+        controller.setPatternList(clone);
+
+        new DialogBuilder()
+                .title("编辑模板列表")
+                .logo(AppLogo.getLogo())
+                .body("/fxml/pattern-list-info.fxml", controller)
+                .buttons(ButtonType.OK, ButtonType.CANCEL)
+                .onOkButtonClicked(e -> PatternList.copyPropsTo(clone, patternList))
+                .showAndWait();
+    }
+
+    public void deletePattenListClicked() {
+    }
+
+    public void moveUpPatternListClicked() {
+    }
+
+    public void moveDownPatternListClicked() {
     }
 }

@@ -40,12 +40,12 @@
                             <Insets topRightBottomLeft="7"/>
                         </padding>
                         <Label text="列表（越靠前优先级越高）"/>
-                        <ListView VBox.vgrow="ALWAYS" editable="true"/>
+                        <ListView VBox.vgrow="ALWAYS" fx:id="lvPatternList"/>
                         <HBox spacing="7">
-                            <Button text="添加"/>
-                            <Button text="删除"/>
-                            <Button text="上移"/>
-                            <Button text="下移"/>
+                            <Button text="添加" onAction="#addPatternListClicked"/>
+                            <Button text="删除" onAction="#deletePattenListClicked"/>
+                            <Button text="上移" onAction="#moveUpPatternListClicked"/>
+                            <Button text="下移" onAction="#moveDownPatternListClicked"/>
                         </HBox>
                     </VBox>
                     <VBox spacing="7">
@@ -53,7 +53,7 @@
                             <Insets topRightBottomLeft="7"/>
                         </padding>
                         <Label text="列表内容"/>
-                        <ListView VBox.vgrow="ALWAYS" editable="true"/>
+                        <ListView VBox.vgrow="ALWAYS"/>
                         <HBox spacing="7">
                             <Button text="添加"/>
                             <Button text="删除"/>

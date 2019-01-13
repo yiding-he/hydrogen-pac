@@ -21,6 +21,18 @@ public class PatternList {
         return patternList;
     }
 
+    public static void copyPropsTo(PatternList p1, PatternList p2) {
+        p2.setName(p1.getName());
+        p2.setProxyName(p1.getProxyName());
+        p2.setPattens(p1.getPattens());
+    }
+
+    public static PatternList cloneOf(PatternList patternList) {
+        PatternList clone = new PatternList();
+        copyPropsTo(patternList, clone);
+        return clone;
+    }
+
     public String getName() {
         return name.get();
     }
@@ -52,4 +64,5 @@ public class PatternList {
     public void setProxyName(String proxyName) {
         this.proxyName.set(proxyName);
     }
+
 }

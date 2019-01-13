@@ -24,11 +24,15 @@
     </properties>
 
     <dependencies>
+
+        <!-- https://gitee.com/yidinghe/hydrogen-fx -->
+        <!-- You need to clone and install it -->
         <dependency>
             <groupId>com.hyd</groupId>
             <artifactId>hydrogen-fx</artifactId>
             <version>${hydrogen-fx.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
