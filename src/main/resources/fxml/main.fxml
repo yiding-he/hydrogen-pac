@@ -15,6 +15,8 @@
                 <MenuItem text="打开..." accelerator="Shortcut+O" onAction="#openFileClicked"/>
                 <MenuItem text="保存" accelerator="Shortcut+S" onAction="#saveFileClicked"/>
                 <MenuItem text="另存为..." onAction="#saveAsClicked"/>
+                <SeparatorMenuItem/>
+                <MenuItem text="导出为 PAC 文件..." onAction="#exportClicked"/>
             </Menu>
         </MenuBar>
     </top>

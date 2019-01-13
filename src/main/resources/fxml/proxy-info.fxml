@@ -12,11 +12,15 @@
         <TextField fx:id="txtName" HBox.hgrow="ALWAYS"/>
     </HBox>
     <HBox spacing="7" alignment="BASELINE_LEFT">
+        <Label text="类型：" minWidth="50"/>
+        <ComboBox fx:id="cmbType" HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <HBox spacing="7" alignment="BASELINE_LEFT">
         <Label text="主机：" minWidth="50"/>
         <TextField fx:id="txtHost" HBox.hgrow="ALWAYS"/>
     </HBox>
     <HBox spacing="7" alignment="BASELINE_LEFT">
-        <Label text="主机：" minWidth="50"/>
-        <Spinner fx:id="spnPort" prefWidth="150" min="0" max="65535"/>
+        <Label text="端口：" minWidth="50"/>
+        <Spinner fx:id="spnPort" prefWidth="150" min="0" max="65535" editable="true"/>
     </HBox>
 </VBox>

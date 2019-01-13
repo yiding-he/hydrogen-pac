@@ -14,12 +14,15 @@ import com.hyd.hydrogenpac.model.Configuration;
 import com.hyd.hydrogenpac.model.EntryNames;
 import com.hyd.hydrogenpac.model.PatternList;
 import com.hyd.hydrogenpac.model.Proxy;
+import com.hyd.hydrogenpac.pac.PacTemplate;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import static com.hyd.fx.app.AppPrimaryStage.getPrimaryStage;
 
@@ -37,8 +40,10 @@ public class MainController {
 
         TableViewBuilder.of(tblProxy)
                 .addStrPropertyColumn("名称", Proxy::nameProperty)
+                .addStrPropertyColumn("类型", Proxy::typeProperty)
                 .addStrPropertyColumn("主机", Proxy::hostProperty)
                 .addIntPropertyColumn("端口", proxy -> proxy.portProperty().asObject())
+                .setColumnWidths(100, 100, 300, 100)
                 .setOnItemDoubleClick(this::editProxy);
 
         ListViewBuilder.of(lvPatternList)
@@ -170,5 +175,20 @@ public class MainController {
     }
 
     public void moveDownPatternListClicked() {
+    }
+
+    ////////////////////////////////////////////////////////////// Export
+
+    public void exportClicked() throws IOException {
+
+        File file = FileDialog.showSaveFile(getPrimaryStage(),
+                "导出 PAC 文件", "*.pac", "PAC 文件", "未命名.pac");
+
+        if (file == null) {
+            return;
+        }
+
+        String pacContent = PacTemplate.generatePac();
+        Files.write(file.toPath(), pacContent.getBytes(StandardCharsets.UTF_8));
     }
 }

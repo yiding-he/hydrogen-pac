@@ -8,15 +8,18 @@ import javafx.beans.property.StringProperty;
 
 public class Proxy {
 
-    private StringProperty  name = new SimpleStringProperty();
+    private StringProperty name = new SimpleStringProperty();
 
-    private StringProperty  host = new SimpleStringProperty();
+    private StringProperty type = new SimpleStringProperty();
+
+    private StringProperty host = new SimpleStringProperty();
 
     private IntegerProperty port = new SimpleIntegerProperty();
 
     public static Proxy parse(JSONObject proxyObj) {
         Proxy proxy = new Proxy();
         proxy.setName(proxyObj.getString("name"));
+        proxy.setType(proxyObj.getString("type"));
         proxy.setHost(proxyObj.getString("host"));
         proxy.setPort(proxyObj.getInteger("port"));
         return proxy;
@@ -30,8 +33,21 @@ public class Proxy {
 
     public static void copyPropsTo(Proxy p1, Proxy p2) {
         p2.setName(p1.getName());
+        p2.setType(p1.getType());
         p2.setHost(p1.getHost());
         p2.setPort(p1.getPort());
+    }
+
+    public String getType() {
+        return type.get();
+    }
+
+    public StringProperty typeProperty() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type.set(type);
     }
 
     public String getName() {
