@@ -16,7 +16,10 @@
                 <MenuItem text="保存" accelerator="Shortcut+S" onAction="#saveFileClicked"/>
                 <MenuItem text="另存为..." onAction="#saveAsClicked"/>
                 <SeparatorMenuItem/>
-                <MenuItem text="导出为 PAC 文件..." onAction="#exportClicked"/>
+                <Menu text="导出">
+                    <MenuItem text="导出到剪切板" onAction="#exportToClipboardClicked"/>
+                    <MenuItem text="导出为 PAC 文件..." onAction="#exportClicked"/>
+                </Menu>
             </Menu>
         </MenuBar>
     </top>
@@ -31,7 +34,7 @@
                     <TableView VBox.vgrow="ALWAYS" fx:id="tblProxy"/>
                     <HBox spacing="7">
                         <Button text="添加..." onAction="#addProxyClicked"/>
-                        <Button text="删除"/>
+                        <Button text="删除" onAction="#deleteProxyClicked"/>
                     </HBox>
                 </VBox>
             </Tab>
@@ -55,10 +58,10 @@
                             <Insets topRightBottomLeft="7"/>
                         </padding>
                         <Label text="列表内容"/>
-                        <ListView VBox.vgrow="ALWAYS"/>
+                        <ListView VBox.vgrow="ALWAYS" fx:id="lvPatterns"/>
                         <HBox spacing="7">
-                            <Button text="添加"/>
-                            <Button text="删除"/>
+                            <Button text="添加" onAction="#addPatternClicked"/>
+                            <Button text="删除" onAction="#deletePatternClicked"/>
                         </HBox>
                     </VBox>
                 </SplitPane>

@@ -42,7 +42,7 @@ function FindProxyForURL(url, host) {
     }
 
     // noinspection JSConstructorReturnsPrimitive
-    return DEFAULT_PROXY_RESULT;
+    return "DIRECT";
 }
 
 function parseProxy(proxy) {
@@ -133,7 +133,7 @@ function matchIP(url, ip) {
 function doMatch(url, patternList) {
     try {
         for (var i = 0; i < patternList.length; i++) {
-            var pattern = convert(patternList[i], -1);
+            var pattern = patternList[i];
 
             if (pattern === '') {
                 continue;

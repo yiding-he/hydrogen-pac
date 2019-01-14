@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.hyd.hydrogenpac.controller.PatternInfoController"
+      prefWidth="500.0" spacing="7">
+
+    <HBox spacing="7" alignment="BASELINE_LEFT">
+        <Label text="模板：" minWidth="50"/>
+        <TextField fx:id="txtPattern" HBox.hgrow="ALWAYS"/>
+    </HBox>
+</VBox>

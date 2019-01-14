@@ -4,10 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.hyd.fx.app.AppLogo;
 import com.hyd.fx.builders.ListViewBuilder;
 import com.hyd.fx.builders.TableViewBuilder;
+import com.hyd.fx.dialog.AlertDialog;
 import com.hyd.fx.dialog.DialogBuilder;
 import com.hyd.fx.dialog.FileDialog;
+import com.hyd.fx.system.ClipboardHelper;
 import com.hyd.fx.system.ZipFileCreator;
 import com.hyd.fx.system.ZipFileReader;
+import com.hyd.hydrogenpac.AppContext;
 import com.hyd.hydrogenpac.HydrogenPacApplication;
 import com.hyd.hydrogenpac.helper.DisplayTextHelper;
 import com.hyd.hydrogenpac.model.Configuration;
@@ -17,6 +20,7 @@ import com.hyd.hydrogenpac.model.Proxy;
 import com.hyd.hydrogenpac.pac.PacTemplate;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TableView;
 
 import java.io.File;
@@ -28,13 +32,15 @@ import static com.hyd.fx.app.AppPrimaryStage.getPrimaryStage;
 
 public class MainController {
 
-    public static final String EXT = "*.hpac";
+    private static final String EXT = "*.hpac";
 
-    public static final String EXT_NAME = "PAC 数据文件";
+    private static final String EXT_NAME = "PAC 数据文件";
 
     public TableView<Proxy> tblProxy;
 
     public ListView<PatternList> lvPatternList;
+
+    public ListView<String> lvPatterns;
 
     public void initialize() {
 
@@ -48,7 +54,11 @@ public class MainController {
 
         ListViewBuilder.of(lvPatternList)
                 .setOnItemDoubleClick(this::editPatternList)
+                .setOnItemSelected(patternList -> this.lvPatterns.setItems(patternList.getPatterns()))
                 .setStringFunction(DisplayTextHelper::getDisplayText);
+
+        ListViewBuilder.of(lvPatterns)
+                .setOnItemDoubleClick(pattern -> this.editPattern());
 
         loadConfiguration(HydrogenPacApplication.getConfiguration());
     }
@@ -69,9 +79,16 @@ public class MainController {
         HydrogenPacApplication.setConfiguration(configuration);
 
         loadConfiguration(configuration);
+        AppContext.getInstance().setCurrentFile(file.getAbsolutePath());
     }
 
     public void saveFileClicked() throws IOException {
+        String currentFile = AppContext.getInstance().getCurrentFile();
+        if (currentFile == null) {
+            saveAsClicked();
+        } else {
+            saveToFile(new File(currentFile));
+        }
     }
 
     public void saveAsClicked() throws IOException {
@@ -88,9 +105,24 @@ public class MainController {
         String json = JSON.toJSONString(HydrogenPacApplication.getConfiguration());
         creator.putEntry(EntryNames.CONFIGURATION, json, "UTF-8");
         creator.close();
+
+        AppContext.getInstance().setCurrentFile(file.getAbsolutePath());
     }
 
     ////////////////////////////////////////////////////////////// PROXY
+
+    public void deleteProxyClicked() {
+        Proxy proxy = tblProxy.getSelectionModel().getSelectedItem();
+        if (proxy == null) {
+            return;
+        }
+
+        if (!AlertDialog.confirmYesNo("删除代理", "确定要删除“" + proxy.getName() + "”吗？")) {
+            return;
+        }
+
+        tblProxy.getItems().remove(proxy);
+    }
 
     public void addProxyClicked() {
         ProxyInfoController controller = new ProxyInfoController();
@@ -169,12 +201,44 @@ public class MainController {
     }
 
     public void deletePattenListClicked() {
+        PatternList patternList = lvPatternList.getSelectionModel().getSelectedItem();
+        if (patternList == null) {
+            return;
+        }
+
+        if (!AlertDialog.confirmYesNo("删除模板列表", "确认要删除模板列表“" + patternList.getName() + "”吗？")) {
+            return;
+        }
+
+        lvPatternList.getItems().remove(patternList);
     }
 
     public void moveUpPatternListClicked() {
+        PatternList patternList = lvPatternList.getSelectionModel().getSelectedItem();
+        if (patternList == null) {
+            return;
+        }
+
+        int index = lvPatternList.getItems().indexOf(patternList);
+        if (index > 0) {
+            lvPatternList.getItems().remove(patternList);
+            lvPatternList.getItems().add(index - 1, patternList);
+            lvPatternList.getSelectionModel().select(patternList);
+        }
     }
 
     public void moveDownPatternListClicked() {
+        PatternList patternList = lvPatternList.getSelectionModel().getSelectedItem();
+        if (patternList == null) {
+            return;
+        }
+
+        int index = lvPatternList.getItems().indexOf(patternList);
+        if (index < lvPatternList.getItems().size() - 1) {
+            lvPatternList.getItems().remove(patternList);
+            lvPatternList.getItems().add(index + 1, patternList);
+            lvPatternList.getSelectionModel().select(patternList);
+        }
     }
 
     ////////////////////////////////////////////////////////////// Export
@@ -191,4 +255,54 @@ public class MainController {
         String pacContent = PacTemplate.generatePac();
         Files.write(file.toPath(), pacContent.getBytes(StandardCharsets.UTF_8));
     }
+
+    public void exportToClipboardClicked() throws IOException {
+        String pacContent = PacTemplate.generatePac();
+        ClipboardHelper.putString(pacContent);
+        AlertDialog.info("导出到剪切板", "PAC 内容已导出到剪切板。");
+    }
+
+    ////////////////////////////////////////////////////////////// Pattern
+
+    public void addPatternClicked() {
+        PatternInfoController controller = new PatternInfoController();
+        controller.setPattern(-1, "");
+
+        new DialogBuilder()
+                .title("添加模板")
+                .logo(AppLogo.getLogo())
+                .body("/fxml/pattern-info.fxml", controller)
+                .buttons(ButtonType.OK, ButtonType.CANCEL)
+                .onOkButtonClicked(e -> controller.apply(this.lvPatterns.getItems()))
+                .showAndWait();
+    }
+
+    public void deletePatternClicked() {
+        String pattern = lvPatterns.getSelectionModel().getSelectedItem();
+        if (pattern == null) {
+            return;
+        }
+
+        if (!AlertDialog.confirmYesNo("删除模板", "确定要删除“" + pattern + "”吗？")) {
+            return;
+        }
+
+        lvPatterns.getItems().remove(pattern);
+    }
+
+    private void editPattern() {
+
+        MultipleSelectionModel<String> m = this.lvPatterns.getSelectionModel();
+        PatternInfoController controller = new PatternInfoController();
+        controller.setPattern(m.getSelectedIndex(), m.getSelectedItem());
+
+        new DialogBuilder()
+                .title("修改模板")
+                .logo(AppLogo.getLogo())
+                .body("/fxml/pattern-info.fxml", controller)
+                .buttons(ButtonType.OK, ButtonType.CANCEL)
+                .onOkButtonClicked(e -> controller.apply(this.lvPatterns.getItems()))
+                .showAndWait();
+    }
+
 }

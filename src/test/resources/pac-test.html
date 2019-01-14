@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test PAC</title>
+    <script src="pac.js"></script>
+    <script>
+        function testUrl() {
+            var url = document.getElementById('url').value;
+            alert(FindProxyForURL(url));
+        }
+    </script>
+</head>
+<body>
+
+<input type="text" id="url">
+<button onclick="testUrl()">TEST</button>
+
+</body>
+</html>
