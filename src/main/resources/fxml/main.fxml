@@ -17,7 +17,7 @@
                 <MenuItem text="另存为..." onAction="#saveAsClicked"/>
                 <SeparatorMenuItem/>
                 <Menu text="导出">
-                    <MenuItem text="导出到剪切板" onAction="#exportToClipboardClicked"/>
+                    <MenuItem text="导出到剪切板" onAction="#exportToClipboardClicked" accelerator="Shortcut+E"/>
                     <MenuItem text="导出为 PAC 文件..." onAction="#exportClicked"/>
                 </Menu>
             </Menu>
