@@ -27,6 +27,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.function.Predicate;
 
 import static com.hyd.fx.app.AppPrimaryStage.getPrimaryStage;
 
@@ -42,7 +45,7 @@ public class MainController {
 
     public ListView<String> lvPatterns;
 
-    public void initialize() {
+    public void initialize() throws Exception {
 
         TableViewBuilder.of(tblProxy)
                 .addStrPropertyColumn("名称", Proxy::nameProperty)
@@ -61,6 +64,27 @@ public class MainController {
                 .setOnItemDoubleClick(pattern -> this.editPattern());
 
         loadConfiguration(HydrogenPacApplication.getConfiguration());
+
+        checkCurrentDirectoryFiles();
+    }
+
+    private void checkCurrentDirectoryFiles() throws IOException {
+        Predicate<Path> isHpacFile = path ->
+                Files.isRegularFile(path) && path.getFileName().toString().endsWith(".hpac");
+
+        Files.list(Paths.get("."))
+                .filter(isHpacFile)
+                .findFirst()
+                .ifPresent(path -> {
+                    String message = "当前目录下找到文件 " + path.getFileName() + "，是否打开？";
+                    if (AlertDialog.confirmYesNo("打开文件", message)) {
+                        try {
+                            readHpacFile(path.toFile());
+                        } catch (IOException e) {
+                            AlertDialog.error("打开文件失败", e);
+                        }
+                    }
+                });
     }
 
     private void loadConfiguration(Configuration configuration) {
@@ -72,6 +96,14 @@ public class MainController {
     ///////////////////////////////////////////////////////////////
     public void openFileClicked() throws IOException {
         File file = FileDialog.showOpenFile(getPrimaryStage(), "打开文件", EXT, EXT_NAME);
+        if (file == null) {
+            return;
+        }
+
+        readHpacFile(file);
+    }
+
+    private void readHpacFile(File file) throws IOException {
         ZipFileReader reader = new ZipFileReader(file);
 
         String configurationJson = reader.readZipEntryString(EntryNames.CONFIGURATION);
@@ -254,6 +286,9 @@ public class MainController {
 
         String pacContent = PacTemplate.generatePac();
         Files.write(file.toPath(), pacContent.getBytes(StandardCharsets.UTF_8));
+
+        ClipboardHelper.putString(file.toURI().toURL().toExternalForm());
+        AlertDialog.info("导出 PAC 文件", "导出完毕。文件的 URL 地址已经复制到剪切板。");
     }
 
     public void exportToClipboardClicked() throws IOException {
