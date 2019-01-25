@@ -101,6 +101,7 @@ public class MainController {
         }
 
         readHpacFile(file);
+        lastExportFilePath = null;
     }
 
     private void readHpacFile(File file) throws IOException {
