@@ -124,12 +124,10 @@ public class MainController {
     }
 
     public void saveAsClicked() throws IOException {
-        File file = FileDialog.showSaveFile(getPrimaryStage(), "保存", EXT, EXT_NAME, "未命名.hpac");
-        if (file == null) {
-            return;
+        File file = chooseFile("保存", EXT, EXT_NAME, "未命名.hpac");
+        if (file != null) {
+            saveToFile(file);
         }
-
-        saveToFile(file);
     }
 
     private void saveToFile(File file) throws IOException {
@@ -275,13 +273,22 @@ public class MainController {
 
     ////////////////////////////////////////////////////////////// Export
 
+    // 上次导出的文件路径，下次导出时直接使用
+    private String lastExportFilePath;
+
     public void exportClicked() throws IOException {
 
-        File file = FileDialog.showSaveFile(getPrimaryStage(),
-                "导出 PAC 文件", "*.pac", "PAC 文件", "未命名.pac");
+        File file;
+        if (lastExportFilePath != null) {
+            file = new File(lastExportFilePath);
+        } else {
+            file = chooseFile("导出 PAC 文件", "*.pac", "PAC 文件", "未命名.pac");
+        }
 
         if (file == null) {
             return;
+        } else {
+            lastExportFilePath = file.getAbsolutePath();
         }
 
         String pacContent = PacTemplate.generatePac();
@@ -289,6 +296,11 @@ public class MainController {
 
         ClipboardHelper.putString(file.toURI().toURL().toExternalForm());
         AlertDialog.info("导出 PAC 文件", "导出完毕。文件的 URL 地址已经复制到剪切板。");
+    }
+
+    private File chooseFile(String s, String s2, String s3, String s4) {
+        return FileDialog.showSaveFile(getPrimaryStage(),
+                s, s2, s3, s4);
     }
 
     public void exportToClipboardClicked() throws IOException {
