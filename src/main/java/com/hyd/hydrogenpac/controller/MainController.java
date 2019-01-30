@@ -2,6 +2,7 @@ package com.hyd.hydrogenpac.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.hyd.fx.app.AppLogo;
+import com.hyd.fx.app.AppPrimaryStage;
 import com.hyd.fx.builders.ListViewBuilder;
 import com.hyd.fx.builders.TableViewBuilder;
 import com.hyd.fx.dialog.AlertDialog;
@@ -32,6 +33,7 @@ import java.nio.file.Paths;
 import java.util.function.Predicate;
 
 import static com.hyd.fx.app.AppPrimaryStage.getPrimaryStage;
+import static com.hyd.hydrogenpac.HydrogenPacApplication.APP;
 
 public class MainController {
 
@@ -113,6 +115,7 @@ public class MainController {
 
         loadConfiguration(configuration);
         AppContext.getInstance().setCurrentFile(file.getAbsolutePath());
+        updateStageTitle(file);
     }
 
     public void saveFileClicked() throws IOException {
@@ -138,6 +141,12 @@ public class MainController {
         creator.close();
 
         AppContext.getInstance().setCurrentFile(file.getAbsolutePath());
+        updateStageTitle(file);
+    }
+
+    private void updateStageTitle(File file) {
+        String title = APP.getProperty("title") + " - " + file.getName();
+        AppPrimaryStage.getPrimaryStage().setTitle(title);
     }
 
     ////////////////////////////////////////////////////////////// PROXY
@@ -165,6 +174,7 @@ public class MainController {
                 .body("/fxml/proxy-info.fxml", controller)
                 .buttons(ButtonType.OK, ButtonType.CANCEL)
                 .onOkButtonClicked(e -> this.addProxyApply(controller.getProxy()))
+                .onStageShown(event -> controller.txtName.requestFocus())
                 .showAndWait();
     }
 
@@ -185,6 +195,7 @@ public class MainController {
                 .body("/fxml/proxy-info.fxml", controller)
                 .buttons(ButtonType.OK, ButtonType.CANCEL)
                 .onOkButtonClicked(e -> this.editProxyApply(proxy, clone))
+                .onStageShown(event -> controller.txtName.requestFocus())
                 .showAndWait();
     }
 
@@ -204,6 +215,7 @@ public class MainController {
                 .body("/fxml/pattern-list-info.fxml", controller)
                 .buttons(ButtonType.OK, ButtonType.CANCEL)
                 .onOkButtonClicked(e -> this.addPatternListApply(controller.getPatternList()))
+                .onStageShown(event -> controller.txtName.requestFocus())
                 .showAndWait();
     }
 
@@ -228,6 +240,7 @@ public class MainController {
                 .body("/fxml/pattern-list-info.fxml", controller)
                 .buttons(ButtonType.OK, ButtonType.CANCEL)
                 .onOkButtonClicked(e -> PatternList.copyPropsTo(clone, patternList))
+                .onStageShown(event -> controller.txtName.requestFocus())
                 .showAndWait();
     }
 
@@ -322,6 +335,7 @@ public class MainController {
                 .body("/fxml/pattern-info.fxml", controller)
                 .buttons(ButtonType.OK, ButtonType.CANCEL)
                 .onOkButtonClicked(e -> controller.apply(this.lvPatterns.getItems()))
+                .onStageShown(event -> controller.txtPattern.requestFocus())
                 .showAndWait();
     }
 
@@ -350,6 +364,7 @@ public class MainController {
                 .body("/fxml/pattern-info.fxml", controller)
                 .buttons(ButtonType.OK, ButtonType.CANCEL)
                 .onOkButtonClicked(e -> controller.apply(this.lvPatterns.getItems()))
+                .onStageShown(event -> controller.txtPattern.requestFocus())
                 .showAndWait();
     }
 

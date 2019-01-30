@@ -18,6 +18,10 @@ public class HydrogenPacApplication extends Application {
 
     public static final Properties APP = new Properties();
 
+    static {
+        APP.setProperty("title", "PAC 编辑器");
+    }
+
     private static Configuration configuration = new Configuration();
 
     static {
@@ -44,7 +48,9 @@ public class HydrogenPacApplication extends Application {
 
         FXMLLoader fxmlLoader = Fxml.load("/fxml/main.fxml");
         primaryStage.setScene(new Scene(fxmlLoader.getRoot()));
-        primaryStage.setTitle(APP.getProperty("title", "PAC 编辑器"));
+        if (primaryStage.getTitle() == null) {
+            primaryStage.setTitle(APP.getProperty("title"));
+        }
         primaryStage.show();
     }
 }
