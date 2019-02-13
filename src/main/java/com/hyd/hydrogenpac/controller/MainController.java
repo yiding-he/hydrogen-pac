@@ -118,6 +118,17 @@ public class MainController {
         updateStageTitle(file);
     }
 
+    private void saveQuietly() {
+        try {
+            String currentFile = AppContext.getInstance().getCurrentFile();
+            if (currentFile != null) {
+                saveToFile(new File(currentFile));
+            }
+        } catch (IOException e) {
+            AlertDialog.error("文件保存失败", e);
+        }
+    }
+
     public void saveFileClicked() throws IOException {
         String currentFile = AppContext.getInstance().getCurrentFile();
         if (currentFile == null) {
@@ -162,6 +173,7 @@ public class MainController {
         }
 
         tblProxy.getItems().remove(proxy);
+        saveQuietly();
     }
 
     public void addProxyClicked() {
@@ -181,6 +193,7 @@ public class MainController {
     private void addProxyApply(Proxy proxy) {
         if (proxy != null) {
             this.tblProxy.getItems().add(proxy);
+            saveQuietly();
         }
     }
 
@@ -201,6 +214,7 @@ public class MainController {
 
     private void editProxyApply(Proxy proxy, Proxy clone) {
         Proxy.copyPropsTo(clone, proxy);
+        saveQuietly();
     }
 
     ////////////////////////////////////////////////////////////// PATTERN LIST
@@ -222,6 +236,7 @@ public class MainController {
     private void addPatternListApply(PatternList patternList) {
         if (patternList != null) {
             this.lvPatternList.getItems().add(patternList);
+            saveQuietly();
         }
     }
 
@@ -239,9 +254,14 @@ public class MainController {
                 .logo(AppLogo.getLogo())
                 .body("/fxml/pattern-list-info.fxml", controller)
                 .buttons(ButtonType.OK, ButtonType.CANCEL)
-                .onOkButtonClicked(e -> PatternList.copyPropsTo(clone, patternList))
+                .onOkButtonClicked(e -> editPatternListApply(patternList, clone))
                 .onStageShown(event -> controller.txtName.requestFocus())
                 .showAndWait();
+    }
+
+    private void editPatternListApply(PatternList patternList, PatternList clone) {
+        PatternList.copyPropsTo(clone, patternList);
+        saveQuietly();
     }
 
     public void deletePattenListClicked() {
@@ -255,6 +275,7 @@ public class MainController {
         }
 
         lvPatternList.getItems().remove(patternList);
+        saveQuietly();
     }
 
     public void moveUpPatternListClicked() {
@@ -269,6 +290,8 @@ public class MainController {
             lvPatternList.getItems().add(index - 1, patternList);
             lvPatternList.getSelectionModel().select(patternList);
         }
+
+        saveQuietly();
     }
 
     public void moveDownPatternListClicked() {
@@ -283,6 +306,8 @@ public class MainController {
             lvPatternList.getItems().add(index + 1, patternList);
             lvPatternList.getSelectionModel().select(patternList);
         }
+
+        saveQuietly();
     }
 
     ////////////////////////////////////////////////////////////// Export
@@ -334,9 +359,14 @@ public class MainController {
                 .logo(AppLogo.getLogo())
                 .body("/fxml/pattern-info.fxml", controller)
                 .buttons(ButtonType.OK, ButtonType.CANCEL)
-                .onOkButtonClicked(e -> controller.apply(this.lvPatterns.getItems()))
+                .onOkButtonClicked(e -> addEditPatternApply(controller))
                 .onStageShown(event -> controller.txtPattern.requestFocus())
                 .showAndWait();
+    }
+
+    private void addEditPatternApply(PatternInfoController controller) {
+        controller.apply(this.lvPatterns.getItems());
+        saveQuietly();
     }
 
     public void deletePatternClicked() {
@@ -350,6 +380,7 @@ public class MainController {
         }
 
         lvPatterns.getItems().remove(pattern);
+        saveQuietly();
     }
 
     private void editPattern() {
@@ -363,7 +394,7 @@ public class MainController {
                 .logo(AppLogo.getLogo())
                 .body("/fxml/pattern-info.fxml", controller)
                 .buttons(ButtonType.OK, ButtonType.CANCEL)
-                .onOkButtonClicked(e -> controller.apply(this.lvPatterns.getItems()))
+                .onOkButtonClicked(e -> addEditPatternApply(controller))
                 .onStageShown(event -> controller.txtPattern.requestFocus())
                 .showAndWait();
     }
