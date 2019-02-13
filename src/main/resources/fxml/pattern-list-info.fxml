@@ -6,7 +6,6 @@
 <?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.hyd.hydrogenpac.controller.PatternListInfoController"
       prefWidth="300.0" spacing="7">
 
     <HBox spacing="7" alignment="BASELINE_LEFT">

@@ -19,6 +19,7 @@ import com.hyd.hydrogenpac.model.EntryNames;
 import com.hyd.hydrogenpac.model.PatternList;
 import com.hyd.hydrogenpac.model.Proxy;
 import com.hyd.hydrogenpac.pac.PacTemplate;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
@@ -365,7 +366,8 @@ public class MainController {
     }
 
     private void addEditPatternApply(PatternInfoController controller) {
-        controller.apply(this.lvPatterns.getItems());
+        ObservableList<String> items = this.lvPatterns.getItems();
+        controller.apply(items);
         saveQuietly();
     }
 

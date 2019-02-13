@@ -2,10 +2,10 @@ package com.hyd.hydrogenpac.controller;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.control.TextField;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author yiding_he
@@ -27,17 +27,22 @@ public class PatternInfoController {
         this.pattern.set(pattern);
     }
 
-    public void apply(List<String> list) {
+    public void apply(ObservableList<String> list) {
         if (list == null) {
             return;
         }
 
-        if (index == -1) {
-            list.add(pattern.get());
-        } else {
-            list.set(index, pattern.get());
+        List<String> _list = new ArrayList<>(list);
+        if (index >= 0 && index < _list.size()) {
+            _list.remove(index);
         }
 
-        Collections.sort(list);
+        // 去掉重复内容
+        Set<String> distinctPatterns = new HashSet<>(_list);
+        distinctPatterns.add(pattern.get());
+
+        _list = new ArrayList<>(distinctPatterns);
+        Collections.sort(_list);
+        list.setAll(_list);
     }
 }
