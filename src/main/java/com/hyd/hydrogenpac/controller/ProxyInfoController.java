@@ -3,11 +3,10 @@ package com.hyd.hydrogenpac.controller;
 import com.hyd.fx.builders.ComboBoxBuilder;
 import com.hyd.hydrogenpac.model.Proxy;
 import com.hyd.hydrogenpac.model.ProxyTypes;
+import java.util.Objects;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
-
-import java.util.Objects;
 
 public class ProxyInfoController {
 
@@ -28,7 +27,7 @@ public class ProxyInfoController {
 
         ComboBoxBuilder.of(cmbType)
                 .setItems(ProxyTypes.values())
-                .setValue(type -> Objects.equals(proxy.getType(), type))
+                .setInitialValue(type -> Objects.equals(proxy.getType(), type))
                 .setOnChange(type -> proxy.setType(type));
     }
 

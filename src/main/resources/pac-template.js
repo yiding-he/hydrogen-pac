@@ -139,12 +139,18 @@ function doMatch(url, patternList) {
                 continue;
             }
 
-            if (isIP(pattern) && matchIP(url, pattern)) {
-                return true;
-            } else if (isURL(pattern) && matchUrls(url, pattern)) {
-                return true;
-            } else if (matchDomains(url, pattern)) {
-                return true;
+            if (isIP(pattern)) {
+                if (matchIP(url, pattern)) {
+                    return true;
+                }
+            } else if (isURL(pattern)) {
+                if (matchUrls(url, pattern)) {
+                    return true;
+                }
+            } else {
+                if (matchDomains(url, pattern)) {
+                    return true;
+                }
             }
         }
     } catch (e) {

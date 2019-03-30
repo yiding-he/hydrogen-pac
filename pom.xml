@@ -19,7 +19,7 @@
         <!-- dependency versions-->
         <fastjson.version>1.2.49</fastjson.version>
         <junit.version>4.12</junit.version>
-        <hydrogen-fx.version>1.0-SNAPSHOT</hydrogen-fx.version>
+        <hydrogen-fx.version>2.0-SNAPSHOT</hydrogen-fx.version>
         <lombok.version>1.18.4</lombok.version>
     </properties>
 

@@ -1,13 +1,15 @@
 package com.hyd.hydrogenpac.controller;
 
 import static com.hyd.fx.app.AppPrimaryStage.getPrimaryStage;
+import static com.hyd.fx.enhancements.ListCellEnhancements.setOnDoubleClicked;
+import static com.hyd.fx.enhancements.ListCellEnhancements.setOnSelected;
 import static com.hyd.hydrogenpac.HydrogenPacApplication.APP;
 
 import com.alibaba.fastjson.JSON;
 import com.hyd.fx.app.AppLogo;
 import com.hyd.fx.app.AppPrimaryStage;
-import com.hyd.fx.builders.ListViewBuilder;
 import com.hyd.fx.builders.TableViewBuilder;
+import com.hyd.fx.cells.ListCellFactory;
 import com.hyd.fx.dialog.AlertDialog;
 import com.hyd.fx.dialog.DialogBuilder;
 import com.hyd.fx.dialog.FileDialog;
@@ -62,13 +64,18 @@ public class MainController {
         .setColumnWidths(100, 100, 300, 100)
         .setOnItemDoubleClick(this::editProxy);
 
-    ListViewBuilder.of(lvPatternList)
-        .setOnItemDoubleClick(this::editPatternList)
-        .setOnItemSelected(patternList -> this.lvPatterns.setItems(patternList.getPatterns()))
-        .setStringFunction(DisplayTextHelper::getDisplayText);
+    lvPatternList.setCellFactory(new ListCellFactory<PatternList>()
+        .setToStringFunction(DisplayTextHelper::getDisplayText)
+        .setCellInitializer(cell -> {
+          setOnDoubleClicked(cell, this::editPatternList);
+          setOnSelected(cell, patternList -> this.lvPatterns.setItems(patternList.getPatterns()));
+        })
+    );
 
-    ListViewBuilder.of(lvPatterns)
-        .setOnItemDoubleClick(pattern -> this.editPattern());
+    lvPatterns.setCellFactory(new ListCellFactory<String>()
+        .setCellInitializer(cell ->
+            setOnDoubleClicked(cell, pattern -> this.editPattern()))
+    );
 
     loadConfiguration(HydrogenPacApplication.getConfiguration());
 
