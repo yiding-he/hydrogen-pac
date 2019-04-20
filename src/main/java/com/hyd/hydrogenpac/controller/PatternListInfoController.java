@@ -23,6 +23,7 @@ public class PatternListInfoController {
         .setCellFactory(new ListCellFactory<Proxy>()
             .setToStringProperty(Proxy::nameProperty)
         )
+        .setButtonCellToStringProperty(Proxy::nameProperty)
         .setItems(HydrogenPacApplication.getConfiguration().getProxyList())
         .setInitialValue(proxy -> proxy.getName().equals(patternList.getProxyName()))
         .setOnChange(proxy -> this.patternList.setProxyName(proxy.getName()));

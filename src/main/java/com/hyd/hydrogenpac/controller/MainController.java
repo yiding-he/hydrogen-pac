@@ -278,6 +278,7 @@ public class MainController {
 
   private void editPatternListApply(PatternList patternList, PatternList clone) {
     PatternList.copyPropsTo(clone, patternList);
+    this.lvPatternList.refresh();
     saveQuietly();
   }
 
