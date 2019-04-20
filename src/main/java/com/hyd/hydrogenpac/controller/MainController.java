@@ -65,7 +65,7 @@ public class MainController {
         .setOnItemDoubleClick(this::editProxy);
 
     lvPatternList.setCellFactory(new ListCellFactory<PatternList>()
-        .setToStringFunction(DisplayTextHelper::getDisplayText)
+        .withTextFunction(DisplayTextHelper::getDisplayText)
         .setCellInitializer(cell -> {
           setOnDoubleClicked(cell, this::editPatternList);
           setOnSelected(cell, patternList -> this.lvPatterns.setItems(patternList.getPatterns()));

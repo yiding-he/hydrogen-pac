@@ -21,9 +21,8 @@ public class PatternListInfoController {
 
     ComboBoxBuilder.of(this.cmbProxy)
         .setCellFactory(new ListCellFactory<Proxy>()
-            .setToStringProperty(Proxy::nameProperty)
+            .withTextProperty(Proxy::nameProperty)
         )
-        .setButtonCellToStringProperty(Proxy::nameProperty)
         .setItems(HydrogenPacApplication.getConfiguration().getProxyList())
         .setInitialValue(proxy -> proxy.getName().equals(patternList.getProxyName()))
         .setOnChange(proxy -> this.patternList.setProxyName(proxy.getName()));

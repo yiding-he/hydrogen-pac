@@ -12,4 +12,6 @@
         <Label text="模板：" minWidth="50"/>
         <TextField fx:id="txtPattern" HBox.hgrow="ALWAYS"/>
     </HBox>
+    <Label wrapText="true" style="-fx-text-fill: #666666"
+        text="提示：模板内容可以是 URL 或关键字。当是关键字时，只要域名分段中包含该关键字则视为匹配；当是 URL 时，可以用 * 作为通配符。"/>
 </VBox>
