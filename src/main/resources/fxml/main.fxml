@@ -17,10 +17,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane
-        xmlns="http://javafx.com/javafx"
-        xmlns:fx="http://javafx.com/fxml"
-        fx:controller="com.hyd.hydrogenpac.controller.MainController"
-        prefHeight="500.0" prefWidth="700.0">
+    xmlns="http://javafx.com/javafx"
+    xmlns:fx="http://javafx.com/fxml"
+    fx:controller="com.hyd.hydrogenpac.controller.MainController"
+    stylesheets="@/application.css"
+    prefHeight="500.0" prefWidth="700.0">
 
     <top>
         <MenuBar>
