@@ -21,6 +21,7 @@ import com.hyd.fx.system.ZipFileCreator;
 import com.hyd.fx.system.ZipFileReader;
 import com.hyd.hydrogenpac.AppContext;
 import com.hyd.hydrogenpac.HydrogenPacApplication;
+import com.hyd.hydrogenpac.helper.ClearStatusTimer;
 import com.hyd.hydrogenpac.helper.DisplayTextHelper;
 import com.hyd.hydrogenpac.model.Configuration;
 import com.hyd.hydrogenpac.model.EntryNames;
@@ -101,6 +102,7 @@ public class MainController {
     private void setStatus(String text) {
         String timeStamp = new SimpleDateFormat("HH:mm:ss").format(new Date());
         this.lblStatus.setText("[" + timeStamp + "] " + text);
+        ClearStatusTimer.statusSet(this.lblStatus);
     }
 
     private void checkCurrentDirectoryFiles() throws IOException {
@@ -157,6 +159,7 @@ public class MainController {
             if (currentFile != null) {
                 saveToFile(new File(currentFile));
             }
+            setStatus("文件已保存。");
         } catch (IOException e) {
             AlertDialog.error("文件保存失败", e);
         }
