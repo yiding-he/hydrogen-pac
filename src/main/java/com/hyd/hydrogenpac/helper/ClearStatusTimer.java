@@ -7,7 +7,7 @@ import javafx.scene.control.Label;
 
 public class ClearStatusTimer {
 
-    private static Timer timer = new Timer();
+    private static Timer timer = new Timer(true);
 
     public static void statusSet(Label statusLabel) {
         timer.schedule(new TimerTask() {
