@@ -6,6 +6,7 @@ import static com.hyd.fx.enhancements.ListCellEnhancements.addClassOnDragEnter;
 import static com.hyd.fx.enhancements.ListCellEnhancements.canDrag;
 import static com.hyd.fx.enhancements.ListCellEnhancements.setOnDoubleClicked;
 import static com.hyd.fx.enhancements.ListCellEnhancements.setOnSelected;
+import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
 import static com.hyd.hydrogenpac.HydrogenPacApplication.APP;
 
 import com.alibaba.fastjson.JSON;
@@ -19,7 +20,6 @@ import com.hyd.fx.dialog.FileDialog;
 import com.hyd.fx.system.ClipboardHelper;
 import com.hyd.fx.system.ZipFileCreator;
 import com.hyd.fx.system.ZipFileReader;
-import com.hyd.hydrogenpac.AppContext;
 import com.hyd.hydrogenpac.HydrogenPacApplication;
 import com.hyd.hydrogenpac.helper.ClearStatusTimer;
 import com.hyd.hydrogenpac.helper.DisplayTextHelper;
@@ -30,6 +30,7 @@ import com.hyd.hydrogenpac.model.Proxy;
 import com.hyd.hydrogenpac.pac.PacTemplate;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,6 +46,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TableView;
+import org.apache.commons.lang3.StringUtils;
 
 public class MainController {
 
@@ -138,7 +140,7 @@ public class MainController {
         }
 
         readHpacFile(file);
-        lastExportFilePath = null;
+        APP_CONTEXT.setLastExportFilePath(null);
     }
 
     private void readHpacFile(File file) throws IOException {
@@ -149,34 +151,30 @@ public class MainController {
         HydrogenPacApplication.setConfiguration(configuration);
 
         loadConfiguration(configuration);
-        AppContext.getInstance().setCurrentFile(file.getAbsolutePath());
+        APP_CONTEXT.setCurrentFile(file.getAbsolutePath());
         updateStageTitle(file);
     }
 
     private void saveQuietly() {
         try {
-            String currentFile = AppContext.getInstance().getCurrentFile();
+            String currentFile = APP_CONTEXT.getCurrentFile();
             if (currentFile != null) {
-                saveToFile(new File(currentFile));
-            }
-
-            // 自动导出
-            if (lastExportFilePath != null) {
-                exportClicked();
-            } else {
+                saveToFile(createFile(currentFile));
                 setStatus("文件已保存。");
             }
+
+            exportQuietly();
         } catch (IOException e) {
             AlertDialog.error("文件保存失败", e);
         }
     }
 
     public void saveFileClicked() throws IOException {
-        String currentFile = AppContext.getInstance().getCurrentFile();
+        String currentFile = APP_CONTEXT.getCurrentFile();
         if (currentFile == null) {
             saveAsClicked();
         } else {
-            saveToFile(new File(currentFile));
+            saveToFile(createFile(currentFile));
             setStatus("文件已保存。");
         }
     }
@@ -194,7 +192,7 @@ public class MainController {
         creator.putEntry(EntryNames.CONFIGURATION, json, "UTF-8");
         creator.close();
 
-        AppContext.getInstance().setCurrentFile(file.getAbsolutePath());
+        APP_CONTEXT.setCurrentFile(file.getAbsolutePath());
         updateStageTitle(file);
     }
 
@@ -356,29 +354,64 @@ public class MainController {
 
     ////////////////////////////////////////////////////////////// Export
 
-    // 上次导出的文件路径，下次导出时直接使用
-    private String lastExportFilePath;
+    public void exportClicked() {
 
-    public void exportClicked() throws IOException {
-
-        File file;
-        if (lastExportFilePath != null) {
-            file = new File(lastExportFilePath);
-        } else {
-            file = chooseFile("导出 PAC 文件", "*.pac", "PAC 文件", "未命名.pac");
-        }
+        File file = APP_CONTEXT.getLastExportFilePath() != null ?
+            createFile(APP_CONTEXT.getLastExportFilePath()) :
+            chooseFile("导出 PAC 文件", "*.pac", "PAC 文件", getPacFileName());
 
         if (file == null) {
             return;
         } else {
-            lastExportFilePath = file.getAbsolutePath();
+            APP_CONTEXT.setLastExportFilePath(file.getAbsolutePath());
         }
 
-        String pacContent = PacTemplate.generatePac();
-        Files.write(file.toPath(), pacContent.getBytes(StandardCharsets.UTF_8));
+        exportToFile(file);
+    }
 
-        ClipboardHelper.putString(file.toURI().toURL().toExternalForm());
-        setStatus("导出完毕。文件的 URL 地址已经复制到剪切板。");
+    private String getPacFileName() {
+        String exportFilePath = getExportFilePath();
+        if (exportFilePath == null) {
+            return "未命名.pac";
+        } else {
+            return StringUtils.substringAfterLast(exportFilePath, File.separator);
+        }
+    }
+
+    private void exportToFile(File file) {
+        try {
+            String pacContent = PacTemplate.generatePac();
+            Files.write(file.toPath(), pacContent.getBytes(StandardCharsets.UTF_8));
+            setStatus("导出完毕。");
+        } catch (IOException e) {
+            AlertDialog.error("导出 PAC 失败", e);
+        }
+    }
+
+    /**
+     * 尝试自动导出
+     */
+    private void exportQuietly() {
+        String exportFilePath = getExportFilePath();
+        if (exportFilePath != null) {
+            exportToFile(createFile(exportFilePath));
+        }
+    }
+
+    private String getExportFilePath() {
+        String exportFilePath = null;
+
+        if (APP_CONTEXT.getLastExportFilePath() != null) {
+            exportFilePath = APP_CONTEXT.getLastExportFilePath();
+
+        } else if (APP_CONTEXT.getCurrentFile() != null) {
+            exportFilePath = APP_CONTEXT.getCurrentFile().replace(".hpac", ".pac");
+        }
+        return exportFilePath;
+    }
+
+    private File createFile(String path) {
+        return new File(path);
     }
 
     private File chooseFile(String s, String s2, String s3, String s4) {
@@ -444,4 +477,15 @@ public class MainController {
             .showAndWait();
     }
 
+    public void copyUrlClicked() {
+        try {
+            String exportFilePath = getExportFilePath();
+            if (exportFilePath != null) {
+                ClipboardHelper.putString(createFile(exportFilePath).toURI().toURL().toExternalForm());
+                setStatus("文件的 URL 地址已经复制到剪切板。");
+            }
+        } catch (MalformedURLException e) {
+            AlertDialog.error("导出 PAC 文件路径失败", e);
+        }
+    }
 }
