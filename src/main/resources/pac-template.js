@@ -24,11 +24,22 @@ function FindProxyForURL(url, host) {
     var proxies = configuration.proxies;
     var patternLists = configuration.patternLists;
 
+    // 对 localhost 或其他不带 '.' 的域名（通常是内网机器名字）直接访问
+    if (dnsDomainLevels(host) === 0) {
+        // noinspection JSConstructorReturnsPrimitive
+        return "DIRECT";
+    }
+
     try {
         for (var i = 0; i < patternLists.length; i++) {
             var patternList = patternLists[i];
+            var matchResult = doMatch(url, host, patternList.patterns);
 
-            if (doMatch(url, patternList.patterns)) {
+            if (matchResult) {
+                alert("[" + patternList.name + "] " + url);
+            }
+
+            if (matchResult) {
                 var proxyName = patternList.proxyName;
                 for (var j = 0; j < proxies.length; j++) {
                     if (proxies[j].name === proxyName) {
@@ -55,27 +66,8 @@ function parseProxy(proxy) {
 
 //////////////////////////////////////////////////////////////
 
-function getDomain(url) {
-
-    if (url.substring(0, 8) === 'file:///') {
-        return url;
-    } else if (url.substring(0, 7) === 'http://') {
-        url = url.substring(7);
-    } else if (url.substring(0, 8) === 'https://') {
-        url = url.substring(8);
-    }
-
-    var slashIndex = url.indexOf("/");
-    if (slashIndex !== -1) {
-        url = url.substring(0, slashIndex);
-    }
-    return url;
-}
-
 // 检查 url 是否匹配域名模板
-function matchDomains(url, pattern) {
-    var domain = getDomain(url);
-
+function matchDomains(host, pattern) {
     // .abc.com -> abc.com
     // abc -> abc.*
 
@@ -85,7 +77,7 @@ function matchDomains(url, pattern) {
         pattern = pattern + ".*";
     }
 
-    return shExpMatch0(domain, pattern) || shExpMatch0(domain, "*." + pattern);
+    return shExpMatch(host, pattern) || shExpMatch(host, "*." + pattern);
 }
 
 // 判断模板是否是一个完整的 URL
@@ -130,7 +122,7 @@ function matchIP(url, ip) {
 }
 
 // 检查指定的 url 是否与列表中的任何一项匹配
-function doMatch(url, patternList) {
+function doMatch(url, host, patternList) {
     try {
         for (var i = 0; i < patternList.length; i++) {
             var pattern = patternList[i];
@@ -148,64 +140,14 @@ function doMatch(url, patternList) {
                     return true;
                 }
             } else {
-                if (matchDomains(url, pattern)) {
+                if (matchDomains(host, pattern)) {
                     return true;
                 }
             }
         }
-    } catch (e) {
-        if (window.console) {
-            window.console.log(e);
-        }
-    }
-}
 
-// "Better implementation of shExpMatch"
-// https://gist.github.com/ayanamist/2989518
-function shExpMatch0(url, pattern) {
-    var pCharCode;
-    var isAggressive = false;
-    var pIndex;
-    var urlIndex = 0;
-    var lastIndex;
-    var patternLength = pattern.length;
-    var urlLength = url.length;
-    for (pIndex = 0; pIndex < patternLength; pIndex += 1) {
-        pCharCode = pattern.charCodeAt(pIndex); // use charCodeAt for performance, see http://jsperf.com/charat-charcodeat-brackets
-        if (pCharCode === 63) { // use if instead of switch for performance, see http://jsperf.com/switch-if
-            if (isAggressive) {
-                urlIndex += 1;
-            }
-            isAggressive = false;
-            urlIndex += 1;
-        }
-        else if (pCharCode === 42) {
-            if (pIndex === patternLength - 1) {
-                return urlIndex <= urlLength;
-            }
-            else {
-                isAggressive = true;
-            }
-        }
-        else {
-            if (isAggressive) {
-                lastIndex = urlIndex;
-                urlIndex = url.indexOf(String.fromCharCode(pCharCode), lastIndex + 1);
-                if (urlIndex < 0) {
-                    if (url.charCodeAt(lastIndex) !== pCharCode) {
-                        return false;
-                    }
-                    urlIndex = lastIndex;
-                }
-                isAggressive = false;
-            }
-            else {
-                if (urlIndex >= urlLength || url.charCodeAt(urlIndex) !== pCharCode) {
-                    return false;
-                }
-            }
-            urlIndex += 1;
-        }
+        return false;
+    } catch (e) {
+        alert(e);
     }
-    return urlIndex === urlLength;
 }

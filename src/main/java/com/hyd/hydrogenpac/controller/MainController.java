@@ -159,7 +159,13 @@ public class MainController {
             if (currentFile != null) {
                 saveToFile(new File(currentFile));
             }
-            setStatus("文件已保存。");
+
+            // 自动导出
+            if (lastExportFilePath != null) {
+                exportClicked();
+            } else {
+                setStatus("文件已保存。");
+            }
         } catch (IOException e) {
             AlertDialog.error("文件保存失败", e);
         }
