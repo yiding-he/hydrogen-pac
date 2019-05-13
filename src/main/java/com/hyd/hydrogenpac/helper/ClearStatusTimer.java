@@ -9,12 +9,22 @@ public class ClearStatusTimer {
 
     private static Timer timer = new Timer(true);
 
+    private static TimerTask currentTask;
+
     public static void statusSet(Label statusLabel) {
-        timer.schedule(new TimerTask() {
+
+        if (currentTask != null) {
+            currentTask.cancel();
+        }
+
+        currentTask = new TimerTask() {
             @Override
             public void run() {
                 Platform.runLater(() -> statusLabel.setText(""));
             }
-        }, 3000);
+        };
+
+        timer.schedule(currentTask, 3000);
     }
+
 }

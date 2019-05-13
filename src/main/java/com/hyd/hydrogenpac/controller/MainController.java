@@ -171,6 +171,7 @@ public class MainController {
             saveAsClicked();
         } else {
             saveToFile(new File(currentFile));
+            setStatus("文件已保存。");
         }
     }
 
