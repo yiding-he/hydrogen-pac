@@ -23,6 +23,8 @@ import com.hyd.fx.system.ZipFileReader;
 import com.hyd.hydrogenpac.HydrogenPacApplication;
 import com.hyd.hydrogenpac.helper.ClearStatusTimer;
 import com.hyd.hydrogenpac.helper.DisplayTextHelper;
+import com.hyd.hydrogenpac.http.HttpServer;
+import com.hyd.hydrogenpac.http.HttpServer.Status;
 import com.hyd.hydrogenpac.model.Configuration;
 import com.hyd.hydrogenpac.model.EntryNames;
 import com.hyd.hydrogenpac.model.PatternList;
@@ -40,10 +42,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.function.Predicate;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Cell;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TableView;
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +65,8 @@ public class MainController {
     public ListView<String> lvPatterns;
 
     public Label lblStatus;
+
+    public MenuItem menuHttpServer;
 
     public void initialize() throws Exception {
 
@@ -99,6 +105,23 @@ public class MainController {
         loadConfiguration(HydrogenPacApplication.getConfiguration());
 
         checkCurrentDirectoryFiles();
+
+        initServerMenuItem();
+    }
+
+    private void initServerMenuItem() {
+        Status httpServerStatus = HttpServer.getInstance().getStatus();
+        updateServerMenuItem(httpServerStatus);
+
+        HttpServer.getInstance().addStatusListener(this::updateServerMenuItem);
+    }
+
+    private void updateServerMenuItem(Status httpServerStatus) {
+        if (httpServerStatus == Status.Running) {
+            menuHttpServer.setText("HTTP 嵌入服务器[运行中]...");
+        } else if (httpServerStatus == Status.Stopped) {
+            menuHttpServer.setText("HTTP 嵌入服务器[已停止]...");
+        }
     }
 
     private void setStatus(String text) {
@@ -487,5 +510,18 @@ public class MainController {
         } catch (MalformedURLException e) {
             AlertDialog.error("导出 PAC 文件路径失败", e);
         }
+    }
+
+    public void serverMenuItemClicked() {
+        ServerInfoController  controller = new ServerInfoController ();
+
+        new DialogBuilder()
+            .title("HTTP 嵌入服务器")
+            .logo(AppLogo.getLogo())
+            .body("/fxml/server-info.fxml", controller)
+            .buttons(ButtonType.CLOSE)
+            .onOkButtonClicked(e -> {})
+            .onStageShown(event -> {})
+            .showAndWait();
     }
 }

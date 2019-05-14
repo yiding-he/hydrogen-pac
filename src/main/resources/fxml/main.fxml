@@ -63,6 +63,13 @@
                         </ImageView>
                     </graphic>
                 </MenuItem>
+                <MenuItem text="HTTP 嵌入服务器..." fx:id="menuHttpServer" onAction="#serverMenuItemClicked">
+                    <graphic>
+                        <ImageView>
+                            <Image url="@/icons/server.png" requestedWidth="16" requestedHeight="16"/>
+                        </ImageView>
+                    </graphic>
+                </MenuItem>
             </Menu>
         </MenuBar>
     </top>
