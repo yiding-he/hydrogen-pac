@@ -2,14 +2,21 @@ package com.hyd.hydrogenpac.model;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.hyd.hydrogenpac.http.HttpServer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import lombok.Data;
 
+@Data
 public class Configuration {
 
     private ObservableList<Proxy> proxyList = FXCollections.observableArrayList();
 
     private ObservableList<PatternList> patternLists = FXCollections.observableArrayList();
+
+    private boolean httpServerAutoStart;
+
+    private int httpServerPort = HttpServer.DEFAULT_PORT;
 
     public static Configuration parse(JSONObject configObj) {
         Configuration configuration = new Configuration();
@@ -26,22 +33,9 @@ public class Configuration {
             configuration.getPatternLists().add(PatternList.parse(patternListObj));
         });
 
+        configuration.setHttpServerAutoStart(configObj.getBooleanValue("httpServerAutoStart"));
+        configuration.setHttpServerPort(configObj.getIntValue("httpServerPort"));
+
         return configuration;
-    }
-
-    public ObservableList<Proxy> getProxyList() {
-        return proxyList;
-    }
-
-    public void setProxyList(ObservableList<Proxy> proxyList) {
-        this.proxyList = proxyList;
-    }
-
-    public ObservableList<PatternList> getPatternLists() {
-        return patternLists;
-    }
-
-    public void setPatternLists(ObservableList<PatternList> patternLists) {
-        this.patternLists = patternLists;
     }
 }

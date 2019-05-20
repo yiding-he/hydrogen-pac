@@ -7,9 +7,7 @@ import static com.hyd.fx.enhancements.ListCellEnhancements.canDrag;
 import static com.hyd.fx.enhancements.ListCellEnhancements.setOnDoubleClicked;
 import static com.hyd.fx.enhancements.ListCellEnhancements.setOnSelected;
 import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
-import static com.hyd.hydrogenpac.HydrogenPacApplication.APP;
 
-import com.alibaba.fastjson.JSON;
 import com.hyd.fx.app.AppLogo;
 import com.hyd.fx.app.AppPrimaryStage;
 import com.hyd.fx.builders.TableViewBuilder;
@@ -18,15 +16,12 @@ import com.hyd.fx.dialog.AlertDialog;
 import com.hyd.fx.dialog.DialogBuilder;
 import com.hyd.fx.dialog.FileDialog;
 import com.hyd.fx.system.ClipboardHelper;
-import com.hyd.fx.system.ZipFileCreator;
-import com.hyd.fx.system.ZipFileReader;
-import com.hyd.hydrogenpac.HydrogenPacApplication;
+import com.hyd.hydrogenpac.AppConfigurationRepo;
 import com.hyd.hydrogenpac.helper.ClearStatusTimer;
 import com.hyd.hydrogenpac.helper.DisplayTextHelper;
 import com.hyd.hydrogenpac.http.HttpServer;
 import com.hyd.hydrogenpac.http.HttpServer.Status;
 import com.hyd.hydrogenpac.model.Configuration;
-import com.hyd.hydrogenpac.model.EntryNames;
 import com.hyd.hydrogenpac.model.PatternList;
 import com.hyd.hydrogenpac.model.Proxy;
 import com.hyd.hydrogenpac.pac.PacTemplate;
@@ -42,7 +37,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.function.Predicate;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Cell;
 import javafx.scene.control.Label;
@@ -102,10 +96,22 @@ public class MainController {
             })
         );
 
-        loadConfiguration(HydrogenPacApplication.getConfiguration());
+        AppConfigurationRepo.addConfigurationSavedListener(() -> {
+            setStatus("文件已保存。");
+            updateStageTitle(APP_CONTEXT.getCurrentFile());
+            exportQuietly();
+        });
 
+        HttpServer.getInstance().addStatusListener(status -> {
+            if (status == Status.Running) {
+                setStatus("HTTP 服务已开启。");
+            } else if (status == Status.Stopped) {
+                setStatus("HTTP 服务已停止。");
+            }
+        });
+
+        loadConfiguration(APP_CONTEXT.getConfiguration());
         checkCurrentDirectoryFiles();
-
         initServerMenuItem();
     }
 
@@ -152,8 +158,14 @@ public class MainController {
     private void loadConfiguration(Configuration configuration) {
         this.tblProxy.setItems(configuration.getProxyList());
         this.lvPatternList.setItems(configuration.getPatternLists());
-    }
 
+        Configuration c = APP_CONTEXT.getConfiguration();
+        if (c.isHttpServerAutoStart()) {
+            int port = c.getHttpServerPort() == 0? HttpServer.DEFAULT_PORT: c.getHttpServerPort();
+            HttpServer.getInstance().startServer(port);
+        }
+
+    }
 
     ///////////////////////////////////////////////////////////////
     public void openFileClicked() throws IOException {
@@ -167,60 +179,40 @@ public class MainController {
     }
 
     private void readHpacFile(File file) throws IOException {
-        ZipFileReader reader = new ZipFileReader(file);
-
-        String configurationJson = reader.readZipEntryString(EntryNames.CONFIGURATION);
-        Configuration configuration = Configuration.parse(JSON.parseObject(configurationJson));
-        HydrogenPacApplication.setConfiguration(configuration);
-
-        loadConfiguration(configuration);
+        Configuration configuration = AppConfigurationRepo.readConfiguration(file);
+        APP_CONTEXT.setConfiguration(configuration);
         APP_CONTEXT.setCurrentFile(file.getAbsolutePath());
-        updateStageTitle(file);
+        loadConfiguration(configuration);
+        updateStageTitle(file.getAbsolutePath());
     }
 
-    private void saveQuietly() {
-        try {
-            String currentFile = APP_CONTEXT.getCurrentFile();
-            if (currentFile != null) {
-                saveToFile(createFile(currentFile));
-                setStatus("文件已保存。");
-            }
-
-            exportQuietly();
-        } catch (IOException e) {
-            AlertDialog.error("文件保存失败", e);
+    private static void saveQuietly() {
+        String currentFile = APP_CONTEXT.getCurrentFile();
+        if (currentFile != null) {
+            AppConfigurationRepo.saveConfiguration(APP_CONTEXT.getConfiguration(), createFile(currentFile));
         }
     }
 
-    public void saveFileClicked() throws IOException {
+    public void saveFileClicked() {
         String currentFile = APP_CONTEXT.getCurrentFile();
         if (currentFile == null) {
             saveAsClicked();
         } else {
-            saveToFile(createFile(currentFile));
-            setStatus("文件已保存。");
+            AppConfigurationRepo.saveConfiguration(
+                APP_CONTEXT.getConfiguration(), createFile(currentFile)
+            );
         }
     }
 
-    public void saveAsClicked() throws IOException {
+    public void saveAsClicked() {
         File file = chooseFile("保存", EXT, EXT_NAME, "未命名.hpac");
         if (file != null) {
-            saveToFile(file);
+            AppConfigurationRepo.saveConfiguration(APP_CONTEXT.getConfiguration(), file);
         }
     }
 
-    private void saveToFile(File file) throws IOException {
-        ZipFileCreator creator = new ZipFileCreator(file);
-        String json = JSON.toJSONString(HydrogenPacApplication.getConfiguration());
-        creator.putEntry(EntryNames.CONFIGURATION, json, "UTF-8");
-        creator.close();
-
-        APP_CONTEXT.setCurrentFile(file.getAbsolutePath());
-        updateStageTitle(file);
-    }
-
-    private void updateStageTitle(File file) {
-        String title = APP.getProperty("title") + " - " + file.getName();
+    private static void updateStageTitle(String filePath) {
+        String title = APP_CONTEXT.getTitle() + " - " + StringUtils.substringAfterLast(filePath, File.separator);
         AppPrimaryStage.getPrimaryStage().setTitle(title);
     }
 
@@ -433,7 +425,7 @@ public class MainController {
         return exportFilePath;
     }
 
-    private File createFile(String path) {
+    private static File createFile(String path) {
         return new File(path);
     }
 

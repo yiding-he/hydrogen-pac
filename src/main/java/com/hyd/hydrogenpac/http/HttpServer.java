@@ -7,6 +7,8 @@ import java.util.function.Consumer;
 
 public class HttpServer {
 
+    public static final int DEFAULT_PORT = 9999;
+
     private static final HttpServer instance = new HttpServer();
 
     public enum Status {

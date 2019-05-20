@@ -2,6 +2,7 @@ package com.hyd.hydrogenpac.controller;
 
 import com.hyd.fx.builders.ComboBoxBuilder;
 import com.hyd.fx.cells.ListCellFactory;
+import com.hyd.hydrogenpac.AppContext;
 import com.hyd.hydrogenpac.HydrogenPacApplication;
 import com.hyd.hydrogenpac.model.PatternList;
 import com.hyd.hydrogenpac.model.Proxy;
@@ -23,7 +24,7 @@ public class PatternListInfoController {
         .setCellFactory(new ListCellFactory<Proxy>()
             .withTextProperty(Proxy::nameProperty)
         )
-        .setItems(HydrogenPacApplication.getConfiguration().getProxyList())
+        .setItems(AppContext.APP_CONTEXT.getConfiguration().getProxyList())
         .setInitialValue(proxy -> proxy.getName().equals(patternList.getProxyName()))
         .setOnChange(proxy -> this.patternList.setProxyName(proxy.getName()));
   }

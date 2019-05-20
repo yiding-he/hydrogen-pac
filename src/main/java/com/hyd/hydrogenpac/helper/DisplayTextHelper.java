@@ -1,5 +1,6 @@
 package com.hyd.hydrogenpac.helper;
 
+import com.hyd.hydrogenpac.AppContext;
 import com.hyd.hydrogenpac.HydrogenPacApplication;
 import com.hyd.hydrogenpac.model.Configuration;
 import com.hyd.hydrogenpac.model.PatternList;
@@ -14,7 +15,7 @@ public class DisplayTextHelper {
             return patternList.getName() + "（没有指定代理）";
         }
 
-        Configuration c = HydrogenPacApplication.getConfiguration();
+        Configuration c = AppContext.APP_CONTEXT.getConfiguration();
         String proxyName = c.getProxyList().stream()
                 .filter(p -> p.getName().equals(patternList.getProxyName()))
                 .map(Proxy::getName)

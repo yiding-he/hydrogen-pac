@@ -1,11 +1,19 @@
 package com.hyd.hydrogenpac.controller;
 
+import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
+
+import com.hyd.fx.dialog.AlertDialog;
 import com.hyd.fx.system.ClipboardHelper;
+import com.hyd.hydrogenpac.AppConfigurationRepo;
+import com.hyd.hydrogenpac.AppContext;
+import com.hyd.hydrogenpac.HydrogenPacApplication;
 import com.hyd.hydrogenpac.http.HttpServer;
 import com.hyd.hydrogenpac.http.HttpServer.Status;
+import com.hyd.hydrogenpac.model.Configuration;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
@@ -22,22 +30,36 @@ public class ServerInfoController {
 
     public Button btnSwitchServer;
 
+    public CheckBox chkAutoStartServer;
+
     private HttpServer httpServer = HttpServer.getInstance();
 
     public void initialize() {
-        SimpleStringProperty prefix = new SimpleStringProperty("http://localhost:");
-        SimpleStringProperty suffix = new SimpleStringProperty("/pac");
-        lnkServerAddress.textProperty().bind(
-            Bindings.concat(prefix, spnPort.valueProperty(), suffix)
-        );
+        try {
+            SimpleStringProperty prefix = new SimpleStringProperty("http://localhost:");
+            SimpleStringProperty suffix = new SimpleStringProperty("/pac");
+            lnkServerAddress.textProperty().bind(
+                Bindings.concat(prefix, spnPort.valueProperty(), suffix)
+            );
 
-        httpServer.addStatusListener(status -> {
-            updateLblStatus(status);
-            updateBtnSwitchServer(status);
-        });
+            httpServer.addStatusListener(status -> {
+                updateLblStatus(status);
+                updateBtnSwitchServer(status);
+            });
 
-        this.updateLblStatus(httpServer.getStatus());
-        this.updateBtnSwitchServer(httpServer.getStatus());
+            this.updateLblStatus(httpServer.getStatus());
+            this.updateBtnSwitchServer(httpServer.getStatus());
+
+            Configuration c = APP_CONTEXT.getConfiguration();
+            this.chkAutoStartServer.setSelected(c.isHttpServerAutoStart());
+
+            this.chkAutoStartServer.selectedProperty().addListener((_ob, _old, _selected) -> {
+                c.setHttpServerAutoStart(_selected);
+                AppConfigurationRepo.saveConfiguration();
+            });
+        } catch (Exception e) {
+            AlertDialog.error("错误", e);
+        }
     }
 
     private void updateBtnSwitchServer(Status status) {

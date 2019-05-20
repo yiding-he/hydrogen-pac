@@ -1,5 +1,6 @@
 package com.hyd.hydrogenpac;
 
+import com.hyd.hydrogenpac.model.Configuration;
 import lombok.Data;
 
 /**
@@ -7,6 +8,8 @@ import lombok.Data;
  */
 @Data
 public class AppContext {
+
+    public static final String DEFAULT_TITLE = "PAC 编辑器";
 
     public static final AppContext APP_CONTEXT = new AppContext();
 
@@ -16,4 +19,7 @@ public class AppContext {
     // 上次导出的文件路径，下次导出时直接使用
     private String lastExportFilePath;
 
+    private Configuration configuration = new Configuration();
+
+    private String title;
 }

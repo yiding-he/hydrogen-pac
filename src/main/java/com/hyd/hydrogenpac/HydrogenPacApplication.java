@@ -1,13 +1,12 @@
 package com.hyd.hydrogenpac;
 
+import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
+
 import com.hyd.fx.Fxml;
 import com.hyd.fx.app.AppLogo;
 import com.hyd.fx.app.AppPrimaryStage;
 import com.hyd.fx.dialog.FileDialog;
-import com.hyd.hydrogenpac.model.Configuration;
 import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -15,41 +14,21 @@ import javafx.stage.Stage;
 
 public class HydrogenPacApplication extends Application {
 
-  public static final Properties APP = new Properties();
-
-  static {
-    APP.setProperty("title", "PAC 编辑器");
-  }
-
-  private static Configuration configuration = new Configuration();
-
-  static {
-    try {
-      APP.load(HydrogenPacApplication.class.getResourceAsStream("/app.properties"));
-    } catch (IOException e) {
-      // nothing to do
+    static {
+        APP_CONTEXT.setTitle(AppContext.DEFAULT_TITLE);
     }
-  }
 
-  public static Configuration getConfiguration() {
-    return configuration;
-  }
+    public void start(Stage primaryStage) throws Exception {
+        FileDialog.setInitDirectory(new File("."));
+        AppPrimaryStage.setPrimaryStage(primaryStage);
+        AppLogo.setPath("/logo.png");
+        AppLogo.setStageLogo(primaryStage);
 
-  public static void setConfiguration(Configuration configuration) {
-    HydrogenPacApplication.configuration = configuration;
-  }
-
-  public void start(Stage primaryStage) throws Exception {
-    FileDialog.setInitDirectory(new File("."));
-    AppPrimaryStage.setPrimaryStage(primaryStage);
-    AppLogo.setPath("/logo.png");
-    AppLogo.setStageLogo(primaryStage);
-
-    FXMLLoader fxmlLoader = Fxml.load("/fxml/main.fxml");
-    primaryStage.setScene(new Scene(fxmlLoader.getRoot()));
-    if (primaryStage.getTitle() == null) {
-      primaryStage.setTitle(APP.getProperty("title"));
+        FXMLLoader fxmlLoader = Fxml.load("/fxml/main.fxml");
+        primaryStage.setScene(new Scene(fxmlLoader.getRoot()));
+        if (primaryStage.getTitle() == null) {
+            primaryStage.setTitle(APP_CONTEXT.getTitle());
+        }
+        primaryStage.show();
     }
-    primaryStage.show();
-  }
 }
