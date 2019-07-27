@@ -30,5 +30,7 @@ public class HydrogenPacApplication extends Application {
             primaryStage.setTitle(APP_CONTEXT.getTitle());
         }
         primaryStage.show();
+
+        System.out.println("__OK__");
     }
 }
