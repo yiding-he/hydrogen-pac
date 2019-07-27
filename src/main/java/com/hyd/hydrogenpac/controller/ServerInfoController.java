@@ -5,11 +5,9 @@ import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
 import com.hyd.fx.dialog.AlertDialog;
 import com.hyd.fx.system.ClipboardHelper;
 import com.hyd.hydrogenpac.AppConfigurationRepo;
-import com.hyd.hydrogenpac.AppContext;
-import com.hyd.hydrogenpac.HydrogenPacApplication;
 import com.hyd.hydrogenpac.http.HttpServer;
 import com.hyd.hydrogenpac.http.HttpServer.Status;
-import com.hyd.hydrogenpac.model.Configuration;
+import com.hyd.hydrogenpac.model.PacConfiguration;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Button;
@@ -50,7 +48,7 @@ public class ServerInfoController {
             this.updateLblStatus(httpServer.getStatus());
             this.updateBtnSwitchServer(httpServer.getStatus());
 
-            Configuration c = APP_CONTEXT.getConfiguration();
+            PacConfiguration c = APP_CONTEXT.getPacConfiguration();
             this.chkAutoStartServer.setSelected(c.isHttpServerAutoStart());
 
             this.chkAutoStartServer.selectedProperty().addListener((_ob, _old, _selected) -> {

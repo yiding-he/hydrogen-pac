@@ -1,46 +1,38 @@
 package com.hyd.hydrogenpac.controller;
 
 import static com.hyd.fx.app.AppPrimaryStage.getPrimaryStage;
-import static com.hyd.fx.enhancements.ListCellEnhancements.acceptDrag;
-import static com.hyd.fx.enhancements.ListCellEnhancements.addClassOnDragEnter;
-import static com.hyd.fx.enhancements.ListCellEnhancements.canDrag;
-import static com.hyd.fx.enhancements.ListCellEnhancements.setOnDoubleClicked;
-import static com.hyd.fx.enhancements.ListCellEnhancements.setOnSelected;
+import static com.hyd.fx.enhancements.ListCellEnhancements.*;
 import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
 
 import com.hyd.fx.app.AppLogo;
 import com.hyd.fx.app.AppPrimaryStage;
 import com.hyd.fx.builders.TableViewBuilder;
 import com.hyd.fx.cells.ListCellFactory;
-import com.hyd.fx.dialog.AlertDialog;
-import com.hyd.fx.dialog.DialogBuilder;
-import com.hyd.fx.dialog.FileDialog;
+import com.hyd.fx.dialog.*;
 import com.hyd.fx.helpers.DragDropHelper;
 import com.hyd.fx.system.ClipboardHelper;
-import com.hyd.hydrogenpac.AppConfigurationRepo;
+import com.hyd.hydrogenpac.*;
 import com.hyd.hydrogenpac.helper.ClearStatusTimer;
 import com.hyd.hydrogenpac.helper.DisplayTextHelper;
 import com.hyd.hydrogenpac.http.HttpServer;
 import com.hyd.hydrogenpac.http.HttpServer.Status;
-import com.hyd.hydrogenpac.model.Configuration;
-import com.hyd.hydrogenpac.model.PatternList;
-import com.hyd.hydrogenpac.model.Proxy;
+import com.hyd.hydrogenpac.model.*;
 import com.hyd.hydrogenpac.pac.PacTemplate;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Predicate;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.input.DataFormat;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+@Slf4j
 public class MainController {
 
     private static final String EXT = "*.hpac";
@@ -59,7 +51,7 @@ public class MainController {
 
     public TabPane mainPane;
 
-    public void initialize() throws Exception {
+    public void initialize() {
 
         DragDropHelper.of(mainPane)
             .acceptDrop(DataFormat.FILES)
@@ -114,9 +106,47 @@ public class MainController {
             }
         });
 
-        loadConfiguration(APP_CONTEXT.getConfiguration());
-        checkCurrentDirectoryFiles();
+        loadConfiguration(APP_CONTEXT.getPacConfiguration());
+        loadFile();
         initServerMenuItem();
+    }
+
+    private void loadFile() {
+        String filePath = StringUtils.defaultIfBlank(
+            readFromPreferences(),
+            readFromCurrentDirectory()
+        );
+
+        if (StringUtils.isNotEmpty(filePath)) {
+            readHpacFile(new File(filePath));
+        }
+    }
+
+    private String readFromPreferences() {
+        return AppContext.PREFERENCES.get(Prefs.LastOpenFile.name(), null);
+    }
+
+    private String readFromCurrentDirectory() {
+        Value<String> filePath = Value.empty();
+
+        try {
+            Predicate<Path> isHpacFile = path ->
+                Files.isRegularFile(path) && path.getFileName().toString().endsWith(".hpac");
+
+            Files.list(Paths.get("."))
+                .filter(isHpacFile)
+                .findFirst()
+                .ifPresent(path -> {
+                    String message = "当前目录下找到文件 " + path.getFileName() + "，是否打开？";
+                    if (AlertDialog.confirmYesNo("打开文件", message)) {
+                        filePath.set(path.toFile().getAbsolutePath());
+                    }
+                });
+        } catch (IOException e) {
+            log.error("", e);
+        }
+
+        return filePath.get();
     }
 
     private void onFileListDropped(List<File> files) {
@@ -150,35 +180,20 @@ public class MainController {
         ClearStatusTimer.statusSet(this.lblStatus);
     }
 
-    private void checkCurrentDirectoryFiles() throws IOException {
-        Predicate<Path> isHpacFile = path ->
-            Files.isRegularFile(path) && path.getFileName().toString().endsWith(".hpac");
+    private void loadConfiguration(PacConfiguration pacConfiguration) {
+        this.tblProxy.setItems(pacConfiguration.getProxyList());
+        this.lvPatternList.setItems(pacConfiguration.getPatternLists());
 
-        Files.list(Paths.get("."))
-            .filter(isHpacFile)
-            .findFirst()
-            .ifPresent(path -> {
-                String message = "当前目录下找到文件 " + path.getFileName() + "，是否打开？";
-                if (AlertDialog.confirmYesNo("打开文件", message)) {
-                    readHpacFile(path.toFile());
-                }
-            });
-    }
-
-    private void loadConfiguration(Configuration configuration) {
-        this.tblProxy.setItems(configuration.getProxyList());
-        this.lvPatternList.setItems(configuration.getPatternLists());
-
-        Configuration c = APP_CONTEXT.getConfiguration();
+        PacConfiguration c = APP_CONTEXT.getPacConfiguration();
         if (c.isHttpServerAutoStart()) {
-            int port = c.getHttpServerPort() == 0? HttpServer.DEFAULT_PORT: c.getHttpServerPort();
+            int port = c.getHttpServerPort() == 0 ? HttpServer.DEFAULT_PORT : c.getHttpServerPort();
             HttpServer.getInstance().startServer(port);
         }
 
     }
 
     ///////////////////////////////////////////////////////////////
-    public void openFileClicked() throws IOException {
+    public void openFileClicked() {
         File file = FileDialog.showOpenFile(getPrimaryStage(), "打开文件", EXT, EXT_NAME);
         if (file == null) {
             return;
@@ -190,11 +205,12 @@ public class MainController {
 
     private void readHpacFile(File file) {
         try {
-            Configuration configuration = AppConfigurationRepo.readConfiguration(file);
-            APP_CONTEXT.setConfiguration(configuration);
+            PacConfiguration pacConfiguration = AppConfigurationRepo.readConfiguration(file);
+            APP_CONTEXT.setPacConfiguration(pacConfiguration);
             APP_CONTEXT.setCurrentFile(file.getAbsolutePath());
-            loadConfiguration(configuration);
+            loadConfiguration(pacConfiguration);
             updateStageTitle(file.getAbsolutePath());
+            AppContext.PREFERENCES.put(Prefs.LastOpenFile.name(), file.getAbsolutePath());
         } catch (IOException e) {
             AlertDialog.error("打开文件错误", e);
         }
@@ -203,7 +219,7 @@ public class MainController {
     private static void saveQuietly() {
         String currentFile = APP_CONTEXT.getCurrentFile();
         if (currentFile != null) {
-            AppConfigurationRepo.saveConfiguration(APP_CONTEXT.getConfiguration(), createFile(currentFile));
+            AppConfigurationRepo.saveConfiguration(APP_CONTEXT.getPacConfiguration(), createFile(currentFile));
         }
     }
 
@@ -213,7 +229,7 @@ public class MainController {
             saveAsClicked();
         } else {
             AppConfigurationRepo.saveConfiguration(
-                APP_CONTEXT.getConfiguration(), createFile(currentFile)
+                APP_CONTEXT.getPacConfiguration(), createFile(currentFile)
             );
         }
     }
@@ -221,12 +237,12 @@ public class MainController {
     public void saveAsClicked() {
         File file = chooseFile("保存", EXT, EXT_NAME, "未命名.hpac");
         if (file != null) {
-            AppConfigurationRepo.saveConfiguration(APP_CONTEXT.getConfiguration(), file);
+            AppConfigurationRepo.saveConfiguration(APP_CONTEXT.getPacConfiguration(), file);
         }
     }
 
     private static void updateStageTitle(String filePath) {
-        String title = APP_CONTEXT.getTitle() + " - " + StringUtils.substringAfterLast(filePath, File.separator);
+        String title = APP_CONTEXT.getTitle() + " - " + filePath;
         AppPrimaryStage.getPrimaryStage().setTitle(title);
     }
 
@@ -519,15 +535,17 @@ public class MainController {
     }
 
     public void serverMenuItemClicked() {
-        ServerInfoController  controller = new ServerInfoController ();
+        ServerInfoController controller = new ServerInfoController();
 
         new DialogBuilder()
             .title("HTTP 嵌入服务器")
             .logo(AppLogo.getLogo())
             .body("/fxml/server-info.fxml", controller)
             .buttons(ButtonType.CLOSE)
-            .onOkButtonClicked(e -> {})
-            .onStageShown(event -> {})
+            .onOkButtonClicked(e -> {
+            })
+            .onStageShown(event -> {
+            })
             .showAndWait();
     }
 }

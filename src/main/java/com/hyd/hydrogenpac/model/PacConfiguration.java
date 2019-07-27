@@ -8,7 +8,7 @@ import javafx.collections.ObservableList;
 import lombok.Data;
 
 @Data
-public class Configuration {
+public class PacConfiguration {
 
     private ObservableList<Proxy> proxyList = FXCollections.observableArrayList();
 
@@ -18,24 +18,24 @@ public class Configuration {
 
     private int httpServerPort = HttpServer.DEFAULT_PORT;
 
-    public static Configuration parse(JSONObject configObj) {
-        Configuration configuration = new Configuration();
+    public static PacConfiguration parse(JSONObject configObj) {
+        PacConfiguration pacConfiguration = new PacConfiguration();
 
         JSONArray proxyArr = configObj.getJSONArray("proxyList");
         proxyArr.forEach(obj -> {
             JSONObject proxyObj = (JSONObject) obj;
-            configuration.getProxyList().add(Proxy.parse(proxyObj));
+            pacConfiguration.getProxyList().add(Proxy.parse(proxyObj));
         });
 
         JSONArray patternListArr = configObj.getJSONArray("patternLists");
         patternListArr.forEach(obj -> {
             JSONObject patternListObj = (JSONObject) obj;
-            configuration.getPatternLists().add(PatternList.parse(patternListObj));
+            pacConfiguration.getPatternLists().add(PatternList.parse(patternListObj));
         });
 
-        configuration.setHttpServerAutoStart(configObj.getBooleanValue("httpServerAutoStart"));
-        configuration.setHttpServerPort(configObj.getIntValue("httpServerPort"));
+        pacConfiguration.setHttpServerAutoStart(configObj.getBooleanValue("httpServerAutoStart"));
+        pacConfiguration.setHttpServerPort(configObj.getIntValue("httpServerPort"));
 
-        return configuration;
+        return pacConfiguration;
     }
 }
