@@ -112,9 +112,9 @@ public class MainController {
     }
 
     private void loadFile() {
-        String filePath = StringUtils.defaultIfBlank(
-            readFromPreferences(),
-            readFromCurrentDirectory()
+        String filePath = Str.defaultIfBlank(
+            this::readFromPreferences,
+            this::readFromCurrentDirectory
         );
 
         if (StringUtils.isNotEmpty(filePath)) {
