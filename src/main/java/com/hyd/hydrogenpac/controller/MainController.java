@@ -15,6 +15,7 @@ import com.hyd.fx.cells.ListCellFactory;
 import com.hyd.fx.dialog.AlertDialog;
 import com.hyd.fx.dialog.DialogBuilder;
 import com.hyd.fx.dialog.FileDialog;
+import com.hyd.fx.helpers.DragDropHelper;
 import com.hyd.fx.system.ClipboardHelper;
 import com.hyd.hydrogenpac.AppConfigurationRepo;
 import com.hyd.hydrogenpac.helper.ClearStatusTimer;
@@ -33,17 +34,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 import java.util.function.Predicate;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Cell;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.input.DataFormat;
 import org.apache.commons.lang3.StringUtils;
 
 public class MainController {
@@ -62,7 +57,16 @@ public class MainController {
 
     public MenuItem menuHttpServer;
 
+    public TabPane mainPane;
+
     public void initialize() throws Exception {
+
+        DragDropHelper.of(mainPane)
+            .acceptDrop(DataFormat.FILES)
+            .whenDataDropped(DataFormat.FILES, obj -> {
+                @SuppressWarnings("unchecked") List<File> files = (List<File>) obj;
+                onFileListDropped(files);
+            });
 
         TableViewBuilder.of(tblProxy)
             .addStrPropertyColumn("名称", Proxy::nameProperty)
@@ -115,6 +119,16 @@ public class MainController {
         initServerMenuItem();
     }
 
+    private void onFileListDropped(List<File> files) {
+        if (files == null || files.size() != 1) {
+            AlertDialog.error("错误", "只允许拖放一个文件进来。");
+            return;
+        }
+
+        File file = files.get(0);
+        readHpacFile(file);
+    }
+
     private void initServerMenuItem() {
         Status httpServerStatus = HttpServer.getInstance().getStatus();
         updateServerMenuItem(httpServerStatus);
@@ -146,11 +160,7 @@ public class MainController {
             .ifPresent(path -> {
                 String message = "当前目录下找到文件 " + path.getFileName() + "，是否打开？";
                 if (AlertDialog.confirmYesNo("打开文件", message)) {
-                    try {
-                        readHpacFile(path.toFile());
-                    } catch (IOException e) {
-                        AlertDialog.error("打开文件失败", e);
-                    }
+                    readHpacFile(path.toFile());
                 }
             });
     }
@@ -178,12 +188,16 @@ public class MainController {
         APP_CONTEXT.setLastExportFilePath(null);
     }
 
-    private void readHpacFile(File file) throws IOException {
-        Configuration configuration = AppConfigurationRepo.readConfiguration(file);
-        APP_CONTEXT.setConfiguration(configuration);
-        APP_CONTEXT.setCurrentFile(file.getAbsolutePath());
-        loadConfiguration(configuration);
-        updateStageTitle(file.getAbsolutePath());
+    private void readHpacFile(File file) {
+        try {
+            Configuration configuration = AppConfigurationRepo.readConfiguration(file);
+            APP_CONTEXT.setConfiguration(configuration);
+            APP_CONTEXT.setCurrentFile(file.getAbsolutePath());
+            loadConfiguration(configuration);
+            updateStageTitle(file.getAbsolutePath());
+        } catch (IOException e) {
+            AlertDialog.error("打开文件错误", e);
+        }
     }
 
     private static void saveQuietly() {

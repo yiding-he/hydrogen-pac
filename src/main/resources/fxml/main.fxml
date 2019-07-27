@@ -75,7 +75,7 @@
     </top>
 
     <center>
-        <TabPane tabMinWidth="50">
+        <TabPane tabMinWidth="50" fx:id="mainPane">
             <Tab text="代理" closable="false">
                 <VBox spacing="7">
                     <padding>
