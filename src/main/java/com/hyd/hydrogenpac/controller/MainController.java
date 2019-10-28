@@ -26,11 +26,12 @@ import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Predicate;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.input.DataFormat;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class MainController {
@@ -50,6 +51,10 @@ public class MainController {
     public MenuItem menuHttpServer;
 
     public TabPane mainPane;
+
+    public TextField txtKeyword;
+
+    public Button btnAddKeyword;
 
     public void initialize() {
 
@@ -106,6 +111,18 @@ public class MainController {
             }
         });
 
+        txtKeyword.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (Str.isBlank(newValue)) {
+                return;
+            }
+
+            APP_CONTEXT.getPacConfiguration().getPatternLists().forEach(patternList -> {
+                if (patternList.getPatterns().contains(newValue)) {
+                    // todo 需要实现这个方法
+                }
+            });
+        });
+
         loadConfiguration(APP_CONTEXT.getPacConfiguration());
         loadFile();
         initServerMenuItem();
@@ -117,7 +134,7 @@ public class MainController {
             this::readFromCurrentDirectory
         );
 
-        if (StringUtils.isNotEmpty(filePath)) {
+        if (Str.isNotBlank(filePath)) {
             readHpacFile(new File(filePath));
         }
     }
@@ -419,7 +436,7 @@ public class MainController {
         if (exportFilePath == null) {
             return "未命名.pac";
         } else {
-            return StringUtils.substringAfterLast(exportFilePath, File.separator);
+            return Str.substringAfterLast(exportFilePath, File.separator);
         }
     }
 
@@ -473,17 +490,7 @@ public class MainController {
     ////////////////////////////////////////////////////////////// Pattern
 
     public void addPatternClicked() {
-        PatternInfoController controller = new PatternInfoController();
-        controller.setPattern(-1, "");
 
-        new DialogBuilder()
-            .title("添加模板")
-            .logo(AppLogo.getLogo())
-            .body("/fxml/pattern-info.fxml", controller)
-            .buttons(ButtonType.OK, ButtonType.CANCEL)
-            .onOkButtonClicked(e -> addEditPatternApply(controller))
-            .onStageShown(event -> controller.txtPattern.requestFocus())
-            .showAndWait();
     }
 
     private void addEditPatternApply(PatternInfoController controller) {
