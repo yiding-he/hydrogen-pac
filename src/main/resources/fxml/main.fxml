@@ -18,6 +18,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.TextField?>
+<?import com.hyd.fx.components.FilterableListView?>
 <BorderPane
     xmlns="http://javafx.com/javafx"
     xmlns:fx="http://javafx.com/fxml"
@@ -89,32 +92,61 @@
                 </VBox>
             </Tab>
             <Tab text="模板列表" closable="false">
-                <SplitPane dividerPositions="0.35">
-                    <VBox spacing="7">
-                        <padding>
-                            <Insets topRightBottomLeft="7"/>
-                        </padding>
-                        <Label text="列表（越靠前优先级越高）"/>
-                        <ListView VBox.vgrow="ALWAYS" fx:id="lvPatternList"/>
-                        <HBox spacing="7">
-                            <Button text="添加" onAction="#addPatternListClicked"/>
-                            <Button text="删除" onAction="#deletePattenListClicked"/>
-                            <Button text="上移" onAction="#moveUpPatternListClicked"/>
-                            <Button text="下移" onAction="#moveDownPatternListClicked"/>
-                        </HBox>
-                    </VBox>
-                    <VBox spacing="7">
-                        <padding>
-                            <Insets topRightBottomLeft="7"/>
-                        </padding>
-                        <Label text="列表内容"/>
-                        <ListView VBox.vgrow="ALWAYS" fx:id="lvPatterns"/>
-                        <HBox spacing="7">
-                            <Button text="添加" onAction="#addPatternClicked"/>
-                            <Button text="删除" onAction="#deletePatternClicked"/>
-                        </HBox>
-                    </VBox>
-                </SplitPane>
+                <BorderPane>
+                    <center>
+                        <SplitPane dividerPositions="0.35">
+                            <VBox spacing="7">
+                                <padding>
+                                    <Insets topRightBottomLeft="7"/>
+                                </padding>
+                                <Label text="列表（越靠前优先级越高）"/>
+                                <FilterableListView VBox.vgrow="ALWAYS" fx:id="lvPatternList"/>
+                                <TextField HBox.hgrow="ALWAYS" fx:id="txtKeyword" promptText="搜索内容"/>
+                                <HBox spacing="7">
+                                    <Button onAction="#addPatternListClicked">
+                                        <graphic>
+                                            <FontAwesomeIconView glyphName="PLUS_CIRCLE" glyphSize="16"/>
+                                        </graphic>
+                                    </Button>
+                                    <Button onAction="#deletePattenListClicked">
+                                        <graphic>
+                                            <FontAwesomeIconView glyphName="TRASH" glyphSize="16"/>
+                                        </graphic>
+                                    </Button>
+                                    <Button onAction="#moveUpPatternListClicked">
+                                        <graphic>
+                                            <FontAwesomeIconView glyphName="ARROW_UP" size="16"/>
+                                        </graphic>
+                                    </Button>
+                                    <Button onAction="#moveDownPatternListClicked">
+                                        <graphic>
+                                            <FontAwesomeIconView glyphName="ARROW_DOWN" size="16"/>
+                                        </graphic>
+                                    </Button>
+                                </HBox>
+                            </VBox>
+                            <VBox spacing="7">
+                                <padding>
+                                    <Insets topRightBottomLeft="7"/>
+                                </padding>
+                                <Label text="列表内容"/>
+                                <FilterableListView VBox.vgrow="ALWAYS" fx:id="lvPatterns"/>
+                                <HBox spacing="7">
+                                    <Button onAction="#deletePatternClicked">
+                                        <graphic>
+                                            <FontAwesomeIconView glyphName="TRASH" glyphSize="16"/>
+                                        </graphic>
+                                    </Button>
+                                    <Button onAction="#addPatternClicked">
+                                        <graphic>
+                                            <FontAwesomeIconView glyphName="PLUS_CIRCLE" glyphSize="16"/>
+                                        </graphic>
+                                    </Button>
+                                </HBox>
+                            </VBox>
+                        </SplitPane>
+                    </center>
+                </BorderPane>
             </Tab>
         </TabPane>
     </center>

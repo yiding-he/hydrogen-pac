@@ -8,29 +8,49 @@ import com.hyd.fx.app.AppLogo;
 import com.hyd.fx.app.AppPrimaryStage;
 import com.hyd.fx.builders.TableViewBuilder;
 import com.hyd.fx.cells.ListCellFactory;
-import com.hyd.fx.dialog.*;
+import com.hyd.fx.components.FilterableListView;
+import com.hyd.fx.dialog.AlertDialog;
+import com.hyd.fx.dialog.DialogBuilder;
+import com.hyd.fx.dialog.FileDialog;
 import com.hyd.fx.helpers.DragDropHelper;
 import com.hyd.fx.system.ClipboardHelper;
-import com.hyd.hydrogenpac.*;
+import com.hyd.hydrogenpac.AppConfigurationRepo;
+import com.hyd.hydrogenpac.AppContext;
+import com.hyd.hydrogenpac.Prefs;
+import com.hyd.hydrogenpac.Str;
+import com.hyd.hydrogenpac.Value;
 import com.hyd.hydrogenpac.helper.ClearStatusTimer;
 import com.hyd.hydrogenpac.helper.DisplayTextHelper;
 import com.hyd.hydrogenpac.http.HttpServer;
 import com.hyd.hydrogenpac.http.HttpServer.Status;
-import com.hyd.hydrogenpac.model.*;
+import com.hyd.hydrogenpac.model.PacConfiguration;
+import com.hyd.hydrogenpac.model.PatternList;
+import com.hyd.hydrogenpac.model.Proxy;
 import com.hyd.hydrogenpac.pac.PacTemplate;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.function.Predicate;
 import javafx.collections.ObservableList;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Cell;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.input.DataFormat;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class MainController {
@@ -41,15 +61,17 @@ public class MainController {
 
     public TableView<Proxy> tblProxy;
 
-    public ListView<PatternList> lvPatternList;
+    public FilterableListView<PatternList> lvPatternList;
 
-    public ListView<String> lvPatterns;
+    public FilterableListView<String> lvPatterns;
 
     public Label lblStatus;
 
     public MenuItem menuHttpServer;
 
     public TabPane mainPane;
+
+    public TextField txtKeyword;
 
     public void initialize() {
 
@@ -72,7 +94,11 @@ public class MainController {
             .withTextFunction(DisplayTextHelper::getDisplayText)
             .setCellInitializer(cell -> {
                 setOnDoubleClicked(cell, this::editPatternList);
-                setOnSelected(cell, patternList -> this.lvPatterns.setItems(patternList.getPatterns()));
+                setOnSelected(cell, patternList -> {
+                    if (patternList != null) {
+                        onPatternListSelected(patternList);
+                    }
+                });
                 addClassOnDragEnter(cell, "list-cell-drag-hover");
                 acceptDrag(cell, data -> {
                     ObservableList<String> patterns = cell.getItem().getPatterns();
@@ -86,7 +112,7 @@ public class MainController {
             .setCellInitializer(cell -> {
                 setOnDoubleClicked(cell, pattern -> this.editPattern());
                 canDrag(cell, Cell::getItem, () -> {
-                    cell.getListView().getItems().remove(cell.getItem());
+                    lvPatterns.getOriginalItems().remove(cell.getItem());
                     saveQuietly();
                 });
             })
@@ -106,9 +132,35 @@ public class MainController {
             }
         });
 
+        txtKeyword.textProperty().addListener((observable, oldValue, newValue) -> {
+
+            if (Str.isBlank(newValue)) {
+                lvPatternList.filter(null);
+            } else {
+                lvPatternList.filter(patternList ->
+                    patternList.getPatterns().stream().anyMatch(pattern -> pattern.contains(newValue))
+                );
+            }
+
+            if (!lvPatternList.getItems().isEmpty()) {
+                lvPatternList.getSelectionModel().select(0);
+            }
+        });
+
         loadConfiguration(APP_CONTEXT.getPacConfiguration());
         loadFile();
         initServerMenuItem();
+    }
+
+    private void onPatternListSelected(PatternList patternList) {
+        this.lvPatterns.setOriginalItems(patternList.getPatterns());
+
+        String keyword = txtKeyword.getText();
+        if (Str.isNotBlank(keyword)) {
+            this.lvPatterns.filter(pattern -> pattern.contains(keyword));
+        } else {
+            this.lvPatterns.filter(null);
+        }
     }
 
     private void loadFile() {
@@ -117,7 +169,7 @@ public class MainController {
             this::readFromCurrentDirectory
         );
 
-        if (StringUtils.isNotEmpty(filePath)) {
+        if (Str.isNotBlank(filePath)) {
             readHpacFile(new File(filePath));
         }
     }
@@ -182,7 +234,7 @@ public class MainController {
 
     private void loadConfiguration(PacConfiguration pacConfiguration) {
         this.tblProxy.setItems(pacConfiguration.getProxyList());
-        this.lvPatternList.setItems(pacConfiguration.getPatternLists());
+        this.lvPatternList.setOriginalItems(pacConfiguration.getPatternLists());
 
         PacConfiguration c = APP_CONTEXT.getPacConfiguration();
         if (c.isHttpServerAutoStart()) {
@@ -321,7 +373,7 @@ public class MainController {
 
     private void addPatternListApply(PatternList patternList) {
         if (patternList != null) {
-            this.lvPatternList.getItems().add(patternList);
+            this.lvPatternList.getOriginalItems().add(patternList);
             saveQuietly();
         }
     }
@@ -361,7 +413,7 @@ public class MainController {
             return;
         }
 
-        lvPatternList.getItems().remove(patternList);
+        lvPatternList.getOriginalItems().remove(patternList);
         saveQuietly();
     }
 
@@ -371,10 +423,12 @@ public class MainController {
             return;
         }
 
-        int index = lvPatternList.getItems().indexOf(patternList);
+        ObservableList<PatternList> items = lvPatternList.getOriginalItems();
+
+        int index = items.indexOf(patternList);
         if (index > 0) {
-            lvPatternList.getItems().remove(patternList);
-            lvPatternList.getItems().add(index - 1, patternList);
+            items.remove(patternList);
+            items.add(index - 1, patternList);
             lvPatternList.getSelectionModel().select(patternList);
         }
 
@@ -387,10 +441,12 @@ public class MainController {
             return;
         }
 
-        int index = lvPatternList.getItems().indexOf(patternList);
-        if (index < lvPatternList.getItems().size() - 1) {
-            lvPatternList.getItems().remove(patternList);
-            lvPatternList.getItems().add(index + 1, patternList);
+        ObservableList<PatternList> items = lvPatternList.getOriginalItems();
+
+        int index = items.indexOf(patternList);
+        if (index < items.size() - 1) {
+            items.remove(patternList);
+            items.add(index + 1, patternList);
             lvPatternList.getSelectionModel().select(patternList);
         }
 
@@ -419,7 +475,7 @@ public class MainController {
         if (exportFilePath == null) {
             return "未命名.pac";
         } else {
-            return StringUtils.substringAfterLast(exportFilePath, File.separator);
+            return Str.substringAfterLast(exportFilePath, File.separator);
         }
     }
 
@@ -487,7 +543,7 @@ public class MainController {
     }
 
     private void addEditPatternApply(PatternInfoController controller) {
-        ObservableList<String> items = this.lvPatterns.getItems();
+        ObservableList<String> items = this.lvPatterns.getOriginalItems();
         controller.apply(items);
         saveQuietly();
     }
@@ -502,7 +558,7 @@ public class MainController {
             return;
         }
 
-        lvPatterns.getItems().remove(pattern);
+        lvPatterns.getOriginalItems().remove(pattern);
         saveQuietly();
     }
 
