@@ -20,6 +20,7 @@
 <?import javafx.scene.image.Image?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.TextField?>
+<?import com.hyd.fx.components.FilterableListView?>
 <BorderPane
     xmlns="http://javafx.com/javafx"
     xmlns:fx="http://javafx.com/fxml"
@@ -92,19 +93,6 @@
             </Tab>
             <Tab text="模板列表" closable="false">
                 <BorderPane>
-                    <top>
-                        <HBox alignment="BASELINE_LEFT" spacing="7">
-                            <padding>
-                                <Insets topRightBottomLeft="7"/>
-                            </padding>
-                            <TextField HBox.hgrow="ALWAYS" fx:id="txtKeyword"/>
-                            <Button onAction="#addPatternClicked" fx:id="btnAddKeyword" disable="true">
-                                <graphic>
-                                    <FontAwesomeIconView glyphName="PLUS_CIRCLE" glyphSize="16"/>
-                                </graphic>
-                            </Button>
-                        </HBox>
-                    </top>
                     <center>
                         <SplitPane dividerPositions="0.35">
                             <VBox spacing="7">
@@ -112,7 +100,8 @@
                                     <Insets topRightBottomLeft="7"/>
                                 </padding>
                                 <Label text="列表（越靠前优先级越高）"/>
-                                <ListView VBox.vgrow="ALWAYS" fx:id="lvPatternList"/>
+                                <FilterableListView VBox.vgrow="ALWAYS" fx:id="lvPatternList"/>
+                                <TextField HBox.hgrow="ALWAYS" fx:id="txtKeyword" promptText="搜索内容"/>
                                 <HBox spacing="7">
                                     <Button onAction="#addPatternListClicked">
                                         <graphic>
@@ -141,11 +130,16 @@
                                     <Insets topRightBottomLeft="7"/>
                                 </padding>
                                 <Label text="列表内容"/>
-                                <ListView VBox.vgrow="ALWAYS" fx:id="lvPatterns"/>
+                                <FilterableListView VBox.vgrow="ALWAYS" fx:id="lvPatterns"/>
                                 <HBox spacing="7">
                                     <Button onAction="#deletePatternClicked">
                                         <graphic>
                                             <FontAwesomeIconView glyphName="TRASH" glyphSize="16"/>
+                                        </graphic>
+                                    </Button>
+                                    <Button onAction="#addPatternClicked">
+                                        <graphic>
+                                            <FontAwesomeIconView glyphName="PLUS_CIRCLE" glyphSize="16"/>
                                         </graphic>
                                     </Button>
                                 </HBox>
