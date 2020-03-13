@@ -64,21 +64,72 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.hyd.hydrogenpac.HydrogenPacApplication</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <profiles>
+        <profile>
+            <id>default</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.hyd.hydrogenpac.HydrogenPacApplication</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>build-installer</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.github.fvarrui</groupId>
+                        <artifactId>javapackager</artifactId>
+                        <version>0.9.3</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                                <configuration>
+                                    <name>hydrogen-pac</name>
+                                    <displayName>PAC File Manager</displayName>
+                                    <displayName>PAC File Manager</displayName>
+                                    <organizationName>Yiding He</organizationName>
+                                    <organizationUrl>https://github.com/yiding-he</organizationUrl>
+                                    <jrePath>C:/Program Files/Java/jre1.8.0_241</jrePath>
+                                    <mainClass>com.hyd.hydrogenpac.HydrogenPacApplication</mainClass>
+                                    <bundleJre>false</bundleJre>
+                                    <generateInstaller>false</generateInstaller>
+                                    <administratorRequired>false</administratorRequired>
+                                    <platform>auto</platform>
+                                    <!--
+                                    <additionalResources>
+                                        <param>file path</param>
+                                        <param>folder path</param>
+                                        <param>...</param>
+                                    </additionalResources>
+                                    <additionalModules>
+                                        <param>module1</param>
+                                        <param>module2</param>
+                                        <param>...</param>
+                                    </additionalModules>
+                                    -->
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
