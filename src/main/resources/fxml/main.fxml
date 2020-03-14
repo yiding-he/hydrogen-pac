@@ -86,8 +86,16 @@
                     </padding>
                     <TableView VBox.vgrow="ALWAYS" fx:id="tblProxy"/>
                     <HBox spacing="7">
-                        <Button text="添加..." onAction="#addProxyClicked"/>
-                        <Button text="删除" onAction="#deleteProxyClicked"/>
+                        <Button onAction="#addProxyClicked">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="PLUS_CIRCLE" glyphSize="16"/>
+                            </graphic>
+                        </Button>
+                        <Button onAction="#deleteProxyClicked">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="TRASH" glyphSize="16"/>
+                            </graphic>
+                        </Button>
                     </HBox>
                 </VBox>
             </Tab>
@@ -132,14 +140,14 @@
                                 <Label text="列表内容"/>
                                 <FilterableListView VBox.vgrow="ALWAYS" fx:id="lvPatterns"/>
                                 <HBox spacing="7">
-                                    <Button onAction="#deletePatternClicked">
-                                        <graphic>
-                                            <FontAwesomeIconView glyphName="TRASH" glyphSize="16"/>
-                                        </graphic>
-                                    </Button>
                                     <Button onAction="#addPatternClicked">
                                         <graphic>
                                             <FontAwesomeIconView glyphName="PLUS_CIRCLE" glyphSize="16"/>
+                                        </graphic>
+                                    </Button>
+                                    <Button onAction="#deletePatternClicked">
+                                        <graphic>
+                                            <FontAwesomeIconView glyphName="TRASH" glyphSize="16"/>
                                         </graphic>
                                     </Button>
                                 </HBox>
