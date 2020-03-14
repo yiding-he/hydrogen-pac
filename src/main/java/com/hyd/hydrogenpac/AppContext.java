@@ -1,6 +1,7 @@
 package com.hyd.hydrogenpac;
 
 import com.hyd.hydrogenpac.model.PacConfiguration;
+import java.util.List;
 import java.util.prefs.Preferences;
 import lombok.Data;
 
@@ -15,6 +16,8 @@ public class AppContext {
     public static final AppContext APP_CONTEXT = new AppContext();
 
     public static final Preferences PREFERENCES = Preferences.userRoot().node("com.hyd.pac");
+
+    private List<String> appArguments;
 
     // 当前已经打开的文件路径
     private String currentFile;

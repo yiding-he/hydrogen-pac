@@ -1,6 +1,7 @@
 package com.hyd.hydrogenpac.controller;
 
 import com.hyd.fx.builders.ComboBoxBuilder;
+import com.hyd.fx.components.IntegerSpinner;
 import com.hyd.hydrogenpac.model.Proxy;
 import com.hyd.hydrogenpac.model.ProxyTypes;
 import java.util.Objects;
@@ -14,7 +15,7 @@ public class ProxyInfoController {
 
     public TextField txtHost;
 
-    public Spinner<Integer> spnPort;
+    public IntegerSpinner spnPort;
 
     public ComboBox<String> cmbType;
 

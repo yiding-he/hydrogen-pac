@@ -12,10 +12,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 存取 .hpac 文件
  */
+@Slf4j
 public class AppConfigurationRepo {
 
     private static List<Runnable> onConfigurationSaved = new ArrayList<>();
@@ -32,6 +34,7 @@ public class AppConfigurationRepo {
 
     public static void saveConfiguration() {
         if (APP_CONTEXT.getCurrentFile() == null) {
+            log.info("APP_CONTEXT.getCurrentFile() is null, not saving");
             return;
         }
         saveConfiguration(
@@ -42,16 +45,13 @@ public class AppConfigurationRepo {
 
     public static void saveConfiguration(PacConfiguration pacConfiguration, File file) {
         try {
-            String currentFile = APP_CONTEXT.getCurrentFile();
-            if (currentFile != null) {
-                ZipFileCreator creator = new ZipFileCreator(file);
-                String json = JSON.toJSONString(pacConfiguration);
-                creator.putEntry(EntryNames.CONFIGURATION, json, "UTF-8");
-                creator.close();
+            ZipFileCreator creator = new ZipFileCreator(file);
+            String json = JSON.toJSONString(pacConfiguration);
+            creator.putEntry(EntryNames.CONFIGURATION, json, "UTF-8");
+            creator.close();
 
-                APP_CONTEXT.setCurrentFile(file.getAbsolutePath());
-                onConfigurationSaved.forEach(Runnable::run);
-            }
+            APP_CONTEXT.setCurrentFile(file.getAbsolutePath());
+            onConfigurationSaved.forEach(Runnable::run);
         } catch (IOException e) {
             AlertDialog.error("配置保存失败", e);
         }

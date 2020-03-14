@@ -165,6 +165,7 @@ public class MainController {
 
     private void loadFile() {
         String filePath = Str.defaultIfBlank(
+            this::readFromArguments,
             this::readFromPreferences,
             this::readFromCurrentDirectory
         );
@@ -172,6 +173,14 @@ public class MainController {
         if (Str.isNotBlank(filePath)) {
             readHpacFile(new File(filePath));
         }
+    }
+
+    private String readFromArguments() {
+        List<String> appArguments = APP_CONTEXT.getAppArguments();
+        if (appArguments == null || appArguments.isEmpty()) {
+            return null;
+        }
+        return appArguments.get(0);
     }
 
     private String readFromPreferences() {
@@ -262,7 +271,10 @@ public class MainController {
             APP_CONTEXT.setCurrentFile(file.getAbsolutePath());
             loadConfiguration(pacConfiguration);
             updateStageTitle(file.getAbsolutePath());
-            AppContext.PREFERENCES.put(Prefs.LastOpenFile.name(), file.getAbsolutePath());
+
+            if (System.getProperty("saveLastOpenFile", "1").equals("1")) {
+                AppContext.PREFERENCES.put(Prefs.LastOpenFile.name(), file.getAbsolutePath());
+            }
         } catch (IOException e) {
             AlertDialog.error("打开文件错误", e);
         }
@@ -319,6 +331,7 @@ public class MainController {
         controller.setProxy(new Proxy());
 
         new DialogBuilder()
+            .owner(AppPrimaryStage.getPrimaryStage())
             .title("添加代理")
             .logo(AppLogo.getLogo())
             .body("/fxml/proxy-info.fxml", controller)
@@ -341,6 +354,7 @@ public class MainController {
         controller.setProxy(clone);
 
         new DialogBuilder()
+            .owner(AppPrimaryStage.getPrimaryStage())
             .title("修改代理 - " + proxy.getName())
             .logo(AppLogo.getLogo())
             .body("/fxml/proxy-info.fxml", controller)
@@ -362,6 +376,7 @@ public class MainController {
         controller.setPatternList(new PatternList());
 
         new DialogBuilder()
+            .owner(AppPrimaryStage.getPrimaryStage())
             .title("新建模板列表")
             .logo(AppLogo.getLogo())
             .body("/fxml/pattern-list-info.fxml", controller)
@@ -388,6 +403,7 @@ public class MainController {
         controller.setPatternList(clone);
 
         new DialogBuilder()
+            .owner(AppPrimaryStage.getPrimaryStage())
             .title("编辑模板列表")
             .logo(AppLogo.getLogo())
             .body("/fxml/pattern-list-info.fxml", controller)
@@ -533,6 +549,7 @@ public class MainController {
         controller.setPattern(-1, "");
 
         new DialogBuilder()
+            .owner(AppPrimaryStage.getPrimaryStage())
             .title("添加模板")
             .logo(AppLogo.getLogo())
             .body("/fxml/pattern-info.fxml", controller)
@@ -569,6 +586,7 @@ public class MainController {
         controller.setPattern(m.getSelectedIndex(), m.getSelectedItem());
 
         new DialogBuilder()
+            .owner(AppPrimaryStage.getPrimaryStage())
             .title("修改模板")
             .logo(AppLogo.getLogo())
             .body("/fxml/pattern-info.fxml", controller)
@@ -594,6 +612,7 @@ public class MainController {
         ServerInfoController controller = new ServerInfoController();
 
         new DialogBuilder()
+            .owner(AppPrimaryStage.getPrimaryStage())
             .title("HTTP 嵌入服务器")
             .logo(AppLogo.getLogo())
             .body("/fxml/server-info.fxml", controller)

@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import com.hyd.fx.components.IntegerSpinner?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       prefWidth="300.0" spacing="7">
@@ -20,6 +21,6 @@
     </HBox>
     <HBox spacing="7" alignment="BASELINE_LEFT">
         <Label text="端口：" minWidth="50"/>
-        <Spinner fx:id="spnPort" prefWidth="150" min="0" max="65535" editable="true"/>
+        <IntegerSpinner fx:id="spnPort" prefWidth="150" min="0" max="65535" editable="true"/>
     </HBox>
 </VBox>

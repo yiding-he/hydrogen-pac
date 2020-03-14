@@ -7,6 +7,7 @@ import com.hyd.fx.app.AppLogo;
 import com.hyd.fx.app.AppPrimaryStage;
 import com.hyd.fx.dialog.FileDialog;
 import java.io.File;
+import java.util.Arrays;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -16,6 +17,11 @@ public class HydrogenPacApplication extends Application {
 
     static {
         APP_CONTEXT.setTitle(AppContext.DEFAULT_TITLE);
+    }
+
+    public static void main(String[] args) {
+        APP_CONTEXT.setAppArguments(Arrays.asList(args));
+        launch(args);
     }
 
     public void start(Stage primaryStage) throws Exception {
