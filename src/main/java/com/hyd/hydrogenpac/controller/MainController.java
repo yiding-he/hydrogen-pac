@@ -112,7 +112,7 @@ public class MainController {
             .setCellInitializer(cell -> {
                 setOnDoubleClicked(cell, pattern -> this.editPattern());
                 canDrag(cell, Cell::getItem, () -> {
-                    lvPatterns.getOriginalItems().remove(cell.getItem());
+                    lvPatterns.getSource().remove(cell.getItem());
                     saveQuietly();
                 });
             })
@@ -153,7 +153,7 @@ public class MainController {
     }
 
     private void onPatternListSelected(PatternList patternList) {
-        this.lvPatterns.setOriginalItems(patternList.getPatterns());
+        this.lvPatterns.getSource().setAll(patternList.getPatterns());
 
         String keyword = txtKeyword.getText();
         if (Str.isNotBlank(keyword)) {
@@ -243,7 +243,7 @@ public class MainController {
 
     private void loadConfiguration(PacConfiguration pacConfiguration) {
         this.tblProxy.setItems(pacConfiguration.getProxyList());
-        this.lvPatternList.setOriginalItems(pacConfiguration.getPatternLists());
+        this.lvPatternList.getSource().setAll(pacConfiguration.getPatternLists());
 
         PacConfiguration c = APP_CONTEXT.getPacConfiguration();
         if (c.isHttpServerAutoStart()) {
@@ -388,7 +388,7 @@ public class MainController {
 
     private void addPatternListApply(PatternList patternList) {
         if (patternList != null) {
-            this.lvPatternList.getOriginalItems().add(patternList);
+            this.lvPatternList.getSource().add(patternList);
             saveQuietly();
         }
     }
@@ -429,7 +429,7 @@ public class MainController {
             return;
         }
 
-        lvPatternList.getOriginalItems().remove(patternList);
+        lvPatternList.getSource().remove(patternList);
         saveQuietly();
     }
 
@@ -439,7 +439,7 @@ public class MainController {
             return;
         }
 
-        ObservableList<PatternList> items = lvPatternList.getOriginalItems();
+        ObservableList<PatternList> items = lvPatternList.getSource();
 
         int index = items.indexOf(patternList);
         if (index > 0) {
@@ -457,7 +457,7 @@ public class MainController {
             return;
         }
 
-        ObservableList<PatternList> items = lvPatternList.getOriginalItems();
+        ObservableList<PatternList> items = lvPatternList.getSource();
 
         int index = items.indexOf(patternList);
         if (index < items.size() - 1) {
@@ -560,7 +560,7 @@ public class MainController {
     }
 
     private void addEditPatternApply(PatternInfoController controller) {
-        ObservableList<String> items = this.lvPatterns.getOriginalItems();
+        ObservableList<String> items = this.lvPatterns.getSource();
         controller.apply(items);
         saveQuietly();
     }
@@ -575,7 +575,7 @@ public class MainController {
             return;
         }
 
-        lvPatterns.getOriginalItems().remove(pattern);
+        lvPatterns.getSource().remove(pattern);
         saveQuietly();
     }
 
