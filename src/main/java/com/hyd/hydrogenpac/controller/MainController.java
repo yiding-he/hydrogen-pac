@@ -1,56 +1,38 @@
 package com.hyd.hydrogenpac.controller;
 
-import static com.hyd.fx.app.AppPrimaryStage.getPrimaryStage;
-import static com.hyd.fx.enhancements.ListCellEnhancements.*;
-import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
-
 import com.hyd.fx.app.AppLogo;
 import com.hyd.fx.app.AppPrimaryStage;
 import com.hyd.fx.builders.TableViewBuilder;
 import com.hyd.fx.cells.ListCellFactory;
 import com.hyd.fx.components.FilterableListView;
-import com.hyd.fx.dialog.AlertDialog;
-import com.hyd.fx.dialog.DialogBuilder;
-import com.hyd.fx.dialog.FileDialog;
+import com.hyd.fx.dialog.*;
 import com.hyd.fx.helpers.DragDropHelper;
 import com.hyd.fx.system.ClipboardHelper;
-import com.hyd.hydrogenpac.AppConfigurationRepo;
-import com.hyd.hydrogenpac.AppContext;
-import com.hyd.hydrogenpac.Prefs;
-import com.hyd.hydrogenpac.Str;
-import com.hyd.hydrogenpac.Value;
+import com.hyd.hydrogenpac.*;
 import com.hyd.hydrogenpac.helper.ClearStatusTimer;
 import com.hyd.hydrogenpac.helper.DisplayTextHelper;
 import com.hyd.hydrogenpac.http.HttpServer;
 import com.hyd.hydrogenpac.http.HttpServer.Status;
-import com.hyd.hydrogenpac.model.PacConfiguration;
-import com.hyd.hydrogenpac.model.PatternList;
-import com.hyd.hydrogenpac.model.Proxy;
+import com.hyd.hydrogenpac.model.*;
 import com.hyd.hydrogenpac.pac.PacTemplate;
+import javafx.collections.ObservableList;
+import javafx.scene.control.*;
+import javafx.scene.input.DataFormat;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
-import javafx.collections.ObservableList;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Cell;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.input.DataFormat;
-import lombok.extern.slf4j.Slf4j;
+
+import static com.hyd.fx.app.AppPrimaryStage.getPrimaryStage;
+import static com.hyd.fx.enhancements.ListCellEnhancements.*;
+import static com.hyd.hydrogenpac.AppConfigurationRepo.saveConfiguration;
+import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
 
 @Slf4j
 public class MainController {
@@ -283,7 +265,8 @@ public class MainController {
     private static void saveQuietly() {
         String currentFile = APP_CONTEXT.getCurrentFile();
         if (currentFile != null) {
-            AppConfigurationRepo.saveConfiguration(APP_CONTEXT.getPacConfiguration(), createFile(currentFile));
+            PacConfiguration configuration = APP_CONTEXT.getPacConfiguration();
+            saveConfiguration(configuration, createFile(currentFile));
         }
     }
 
@@ -292,7 +275,7 @@ public class MainController {
         if (currentFile == null) {
             saveAsClicked();
         } else {
-            AppConfigurationRepo.saveConfiguration(
+            saveConfiguration(
                 APP_CONTEXT.getPacConfiguration(), createFile(currentFile)
             );
         }
@@ -301,7 +284,7 @@ public class MainController {
     public void saveAsClicked() {
         File file = chooseFile("保存", EXT, EXT_NAME, "未命名.hpac");
         if (file != null) {
-            AppConfigurationRepo.saveConfiguration(APP_CONTEXT.getPacConfiguration(), file);
+            saveConfiguration(APP_CONTEXT.getPacConfiguration(), file);
         }
     }
 
@@ -545,6 +528,15 @@ public class MainController {
     ////////////////////////////////////////////////////////////// Pattern
 
     public void addPatternClicked() {
+
+        if (Str.isNotBlank(this.txtKeyword.getText())) {
+            return;
+        }
+
+        if (this.lvPatternList.getSelectionModel().getSelectedItem() == null) {
+            return;
+        }
+
         PatternInfoController controller = new PatternInfoController();
         controller.setPattern(-1, "");
 
@@ -562,7 +554,17 @@ public class MainController {
     private void addEditPatternApply(PatternInfoController controller) {
         ObservableList<String> items = this.lvPatterns.getSource();
         controller.apply(items);
+        updatePatternsToConfiguration(items);
+
         saveQuietly();
+    }
+
+    // 界面上的列表回写到 PacConfiguration 对象
+    private void updatePatternsToConfiguration(ObservableList<String> items) {
+        PatternList patternList = this.lvPatternList.getSelectionModel().getSelectedItem();
+        if (patternList != null) {
+            patternList.getPatterns().setAll(items);
+        }
     }
 
     public void deletePatternClicked() {
@@ -575,7 +577,9 @@ public class MainController {
             return;
         }
 
-        lvPatterns.getSource().remove(pattern);
+        ObservableList<String> source = lvPatterns.getSource();
+        source.remove(pattern);
+        updatePatternsToConfiguration(source);
         saveQuietly();
     }
 

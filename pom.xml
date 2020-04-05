@@ -25,7 +25,7 @@
 
     <dependencies>
 
-        <!-- https://gitee.com/yidinghe/hydrogen-fx -->
+        <!-- https://github.com/yiding-he/hydrogen-fx -->
         <!-- You need to clone and install it -->
         <dependency>
             <groupId>com.hyd</groupId>
@@ -111,18 +111,6 @@
                                     <generateInstaller>false</generateInstaller>
                                     <administratorRequired>false</administratorRequired>
                                     <platform>auto</platform>
-                                    <!--
-                                    <additionalResources>
-                                        <param>file path</param>
-                                        <param>folder path</param>
-                                        <param>...</param>
-                                    </additionalResources>
-                                    <additionalModules>
-                                        <param>module1</param>
-                                        <param>module2</param>
-                                        <param>...</param>
-                                    </additionalModules>
-                                    -->
                                 </configuration>
                             </execution>
                         </executions>
