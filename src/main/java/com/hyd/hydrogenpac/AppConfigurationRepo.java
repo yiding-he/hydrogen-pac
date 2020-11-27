@@ -1,18 +1,19 @@
 package com.hyd.hydrogenpac;
 
-import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
-
 import com.alibaba.fastjson.JSON;
 import com.hyd.fx.dialog.AlertDialog;
 import com.hyd.fx.system.ZipFileCreator;
 import com.hyd.fx.system.ZipFileReader;
-import com.hyd.hydrogenpac.model.PacConfiguration;
 import com.hyd.hydrogenpac.model.EntryNames;
+import com.hyd.hydrogenpac.model.PacConfiguration;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+
+import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
 
 /**
  * 存取 .hpac 文件
@@ -20,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AppConfigurationRepo {
 
-    private static List<Runnable> onConfigurationSaved = new ArrayList<>();
+    private static final List<Runnable> onConfigurationSaved = new ArrayList<>();
 
     public static void addConfigurationSavedListener(Runnable runnable) {
         onConfigurationSaved.add(runnable);

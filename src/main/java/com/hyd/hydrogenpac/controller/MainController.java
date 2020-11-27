@@ -31,7 +31,6 @@ import java.util.function.Predicate;
 
 import static com.hyd.fx.app.AppPrimaryStage.getPrimaryStage;
 import static com.hyd.fx.enhancements.ListCellEnhancements.*;
-import static com.hyd.hydrogenpac.AppConfigurationRepo.saveConfiguration;
 import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
 
 @Slf4j
@@ -224,7 +223,7 @@ public class MainController {
     }
 
     private void loadConfiguration(PacConfiguration pacConfiguration) {
-        this.tblProxy.setItems(pacConfiguration.getProxyList());
+        this.tblProxy.getItems().setAll(pacConfiguration.getProxyList());
         this.lvPatternList.getSource().setAll(pacConfiguration.getPatternLists());
 
         PacConfiguration c = APP_CONTEXT.getPacConfiguration();
@@ -262,7 +261,13 @@ public class MainController {
         }
     }
 
-    private static void saveQuietly() {
+    private void saveConfiguration(PacConfiguration conf, File file) {
+        conf.setPatternLists(new ArrayList<>(this.lvPatternList.getSource()));
+        conf.setProxyList(new ArrayList<>(this.tblProxy.getItems()));
+        AppConfigurationRepo.saveConfiguration(conf, file);
+    }
+
+    private void saveQuietly() {
         String currentFile = APP_CONTEXT.getCurrentFile();
         if (currentFile != null) {
             PacConfiguration configuration = APP_CONTEXT.getPacConfiguration();

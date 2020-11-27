@@ -3,16 +3,17 @@ package com.hyd.hydrogenpac.model;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.hyd.hydrogenpac.http.HttpServer;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class PacConfiguration {
 
-    private ObservableList<Proxy> proxyList = FXCollections.observableArrayList();
+    private List<Proxy> proxyList = new ArrayList<>();
 
-    private ObservableList<PatternList> patternLists = FXCollections.observableArrayList();
+    private List<PatternList> patternLists = new ArrayList<>();
 
     private boolean httpServerAutoStart;
 
