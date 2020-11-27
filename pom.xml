@@ -92,7 +92,7 @@
                     <plugin>
                         <groupId>io.github.fvarrui</groupId>
                         <artifactId>javapackager</artifactId>
-                        <version>0.9.3</version>
+                        <version>1.4.1</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
