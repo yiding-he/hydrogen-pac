@@ -1,9 +1,11 @@
 package com.hyd.hydrogenpac;
 
 import com.hyd.hydrogenpac.model.PacConfiguration;
+import lombok.Data;
+
+import java.net.URL;
 import java.util.List;
 import java.util.prefs.Preferences;
-import lombok.Data;
 
 /**
  * @author yiding_he
@@ -16,6 +18,10 @@ public class AppContext {
     public static final AppContext APP_CONTEXT = new AppContext();
 
     public static final Preferences PREFERENCES = Preferences.userRoot().node("com.hyd.pac");
+
+    public static URL loadResource(String path) {
+        return AppContext.class.getResource(path);
+    }
 
     private List<String> appArguments;
 

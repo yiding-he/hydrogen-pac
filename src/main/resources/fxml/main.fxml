@@ -1,26 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import javafx.scene.control.TextField?>
 <?import com.hyd.fx.components.FilterableListView?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <BorderPane
     xmlns="http://javafx.com/javafx"
     xmlns:fx="http://javafx.com/fxml"
@@ -33,16 +17,12 @@
             <Menu text="文件">
                 <MenuItem text="打开..." accelerator="Shortcut+O" onAction="#openFileClicked">
                     <graphic>
-                        <ImageView>
-                            <Image url="@/icons/open.png" requestedWidth="16" requestedHeight="16"/>
-                        </ImageView>
+                        <FontAwesomeIconView glyphName="FOLDER_OPEN_ALT" glyphSize="16"/>
                     </graphic>
                 </MenuItem>
                 <MenuItem text="保存" accelerator="Shortcut+S" onAction="#saveFileClicked">
                     <graphic>
-                        <ImageView>
-                            <Image url="@/icons/save.png" requestedWidth="16" requestedHeight="16"/>
-                        </ImageView>
+                        <FontAwesomeIconView glyphName="SAVE" glyphSize="16"/>
                     </graphic>
                 </MenuItem>
                 <MenuItem text="另存为..." onAction="#saveAsClicked"/>
@@ -50,9 +30,7 @@
                 <Menu text="导出">
                     <MenuItem text="导出到剪切板" onAction="#exportToClipboardClicked" accelerator="Shortcut+E">
                         <graphic>
-                            <ImageView>
-                                <Image url="@/icons/clipboard.png" requestedWidth="16" requestedHeight="16"/>
-                            </ImageView>
+                            <FontAwesomeIconView glyphName="CLIPBOARD" glyphSize="16"/>
                         </graphic>
                     </MenuItem>
                     <MenuItem text="导出为 PAC 文件..." onAction="#exportClicked" accelerator="Shortcut+F"/>
@@ -61,16 +39,12 @@
             <Menu text="工具">
                 <MenuItem text="复制上次导出的 PAC 文件路径为 URL" onAction="#copyUrlClicked">
                     <graphic>
-                        <ImageView>
-                            <Image url="@/icons/copy.png" requestedWidth="16" requestedHeight="16"/>
-                        </ImageView>
+                        <FontAwesomeIconView glyphName="LINK" glyphSize="16"/>
                     </graphic>
                 </MenuItem>
                 <MenuItem text="HTTP 嵌入服务器..." fx:id="menuHttpServer" onAction="#serverMenuItemClicked">
                     <graphic>
-                        <ImageView>
-                            <Image url="@/icons/server.png" requestedWidth="16" requestedHeight="16"/>
-                        </ImageView>
+                        <FontAwesomeIconView glyphName="SERVER" glyphSize="16"/>
                     </graphic>
                 </MenuItem>
             </Menu>

@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -322,7 +321,7 @@ public class MainController {
             .owner(AppPrimaryStage.getPrimaryStage())
             .title("添加代理")
             .logo(AppLogo.getLogo())
-            .body("/fxml/proxy-info.fxml", controller)
+            .body(AppContext.loadResource("/fxml/proxy-info.fxml"), controller)
             .buttons(ButtonType.OK, ButtonType.CANCEL)
             .onOkButtonClicked(e -> this.addProxyApply(controller.getProxy()))
             .onStageShown(event -> controller.txtName.requestFocus())
@@ -345,7 +344,7 @@ public class MainController {
             .owner(AppPrimaryStage.getPrimaryStage())
             .title("修改代理 - " + proxy.getName())
             .logo(AppLogo.getLogo())
-            .body("/fxml/proxy-info.fxml", controller)
+            .body(AppContext.loadResource("/fxml/proxy-info.fxml"), controller)
             .buttons(ButtonType.OK, ButtonType.CANCEL)
             .onOkButtonClicked(e -> this.editProxyApply(proxy, clone))
             .onStageShown(event -> controller.txtName.requestFocus())
@@ -367,7 +366,7 @@ public class MainController {
             .owner(AppPrimaryStage.getPrimaryStage())
             .title("新建模板列表")
             .logo(AppLogo.getLogo())
-            .body("/fxml/pattern-list-info.fxml", controller)
+            .body(AppContext.loadResource("/fxml/pattern-list-info.fxml"), controller)
             .buttons(ButtonType.OK, ButtonType.CANCEL)
             .onOkButtonClicked(e -> this.addPatternListApply(controller.getPatternList()))
             .onStageShown(event -> controller.txtName.requestFocus())
@@ -394,7 +393,7 @@ public class MainController {
             .owner(AppPrimaryStage.getPrimaryStage())
             .title("编辑模板列表")
             .logo(AppLogo.getLogo())
-            .body("/fxml/pattern-list-info.fxml", controller)
+            .body(AppContext.loadResource("/fxml/pattern-list-info.fxml"), controller)
             .buttons(ButtonType.OK, ButtonType.CANCEL)
             .onOkButtonClicked(e -> editPatternListApply(patternList, clone))
             .onStageShown(event -> controller.txtName.requestFocus())
@@ -486,7 +485,7 @@ public class MainController {
     private void exportToFile(File file) {
         try {
             String pacContent = PacTemplate.generatePac();
-            Files.write(file.toPath(), pacContent.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(file.toPath(), pacContent);
             setStatus("导出完毕。");
         } catch (IOException e) {
             AlertDialog.error("导出 PAC 失败", e);
@@ -549,7 +548,7 @@ public class MainController {
             .owner(AppPrimaryStage.getPrimaryStage())
             .title("添加模板")
             .logo(AppLogo.getLogo())
-            .body("/fxml/pattern-info.fxml", controller)
+            .body(AppContext.loadResource("/fxml/pattern-info.fxml"), controller)
             .buttons(ButtonType.OK, ButtonType.CANCEL)
             .onOkButtonClicked(e -> addEditPatternApply(controller))
             .onStageShown(event -> controller.txtPattern.requestFocus())
@@ -598,7 +597,7 @@ public class MainController {
             .owner(AppPrimaryStage.getPrimaryStage())
             .title("修改模板")
             .logo(AppLogo.getLogo())
-            .body("/fxml/pattern-info.fxml", controller)
+            .body(AppContext.loadResource("/fxml/pattern-info.fxml"), controller)
             .buttons(ButtonType.OK, ButtonType.CANCEL)
             .onOkButtonClicked(e -> addEditPatternApply(controller))
             .onStageShown(event -> controller.txtPattern.requestFocus())
@@ -624,7 +623,7 @@ public class MainController {
             .owner(AppPrimaryStage.getPrimaryStage())
             .title("HTTP 嵌入服务器")
             .logo(AppLogo.getLogo())
-            .body("/fxml/server-info.fxml", controller)
+            .body(AppContext.loadResource("/fxml/server-info.fxml"), controller)
             .buttons(ButtonType.CLOSE)
             .onOkButtonClicked(e -> {
             })
