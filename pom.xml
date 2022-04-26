@@ -79,9 +79,6 @@
     <profiles>
         <profile>
             <id>create-single-jar</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -96,6 +93,35 @@
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
                         </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>app-image-windows</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                    <excludeArtifactIds>
+                                        spring-test,spring-boot-test,spring-boot-starter-test,lombok,
+                                        spring-boot-configuration-processor
+                                    </excludeArtifactIds>
+                                    <excludeGroupIds>
+                                        org.junit,org.mockito
+                                    </excludeGroupIds>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
