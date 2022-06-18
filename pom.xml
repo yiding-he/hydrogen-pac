@@ -17,7 +17,7 @@
         <java.version>17</java.version>
 
         <!-- dependency versions-->
-        <fastjson.version>1.2.49</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <junit.version>4.13.1</junit.version>
         <hydrogen-fx.version>3.0-SNAPSHOT</hydrogen-fx.version>
         <lombok.version>1.18.4</lombok.version>
