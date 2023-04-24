@@ -8,12 +8,29 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
 import java.util.Arrays;
 
 import static com.hyd.hydrogenpac.AppContext.APP_CONTEXT;
 
+/**
+ * 运行时需要加上 JVM 参数：
+ * <pre>
+ *     --module-path [本机 javafx-sdk-20.0.1\lib]
+ *     --add-modules javafx.controls
+ *     --add-exports javafx.base/com.sun.javafx.binding=ALL-UNNAMED
+ *     --add-exports javafx.base/com.sun.javafx.reflect=ALL-UNNAMED
+ *     --add-exports javafx.base/com.sun.javafx.beans=ALL-UNNAMED
+ *     --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED
+ *     --add-exports javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED
+ *     --add-exports javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED
+ *     --add-exports javafx.graphics/com.sun.javafx.util=ALL-UNNAMED
+ * </pre>
+ */
+@SpringBootApplication
 public class HydrogenPacMain {
 
     static {
@@ -22,6 +39,7 @@ public class HydrogenPacMain {
 
     public static void main(String[] args) {
         APP_CONTEXT.setAppArguments(Arrays.asList(args));
+        SpringApplication.run(HydrogenPacMain.class, args);
         Application.launch(HydrogenPacApplication.class, args);
     }
 
@@ -40,7 +58,6 @@ public class HydrogenPacMain {
             }
             primaryStage.show();
 
-            System.out.println("__OK__");
         }
 
     }

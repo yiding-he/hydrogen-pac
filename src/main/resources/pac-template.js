@@ -84,7 +84,7 @@ function matchDomains(host, pattern) {
 function isURL(pattern) {
     return pattern.substring(0, 7) === 'http://' ||
         pattern.substring(0, 8) === 'https://' ||
-        pattern.substr(0, 2) === '//';
+        pattern.substring(0, 2) === '//';
 }
 
 // 检查 url 是否匹配 URL 模板
@@ -99,7 +99,7 @@ function matchUrls(url, pattern) {
         pattern = pattern.substring(2);
     }
 
-    return shExpMatch0(url, '*://' + pattern);
+    return shExpMatch(url, '*://' + pattern);
 }
 
 // 判断模板是否是一个 IP 地址

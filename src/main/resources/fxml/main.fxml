@@ -28,12 +28,12 @@
                 <MenuItem text="另存为..." onAction="#saveAsClicked"/>
                 <SeparatorMenuItem/>
                 <Menu text="导出">
-                    <MenuItem text="导出到剪切板" onAction="#exportToClipboardClicked" accelerator="Shortcut+E">
+                    <MenuItem text="导出 PAC 内容到剪切板" onAction="#exportToClipboardClicked" accelerator="Shortcut+E">
                         <graphic>
                             <FontAwesomeIconView glyphName="CLIPBOARD" glyphSize="16"/>
                         </graphic>
                     </MenuItem>
-                    <MenuItem text="导出为 PAC 文件..." onAction="#exportClicked" accelerator="Shortcut+F"/>
+                    <MenuItem text="导出 PAC 内容到文件..." onAction="#exportClicked" accelerator="Shortcut+F"/>
                 </Menu>
             </Menu>
             <Menu text="工具">
@@ -53,7 +53,7 @@
 
     <center>
         <TabPane tabMinWidth="50" fx:id="mainPane">
-            <Tab text="代理" closable="false">
+            <Tab text="代理服务器" closable="false">
                 <VBox spacing="7">
                     <padding>
                         <Insets topRightBottomLeft="7"/>
@@ -73,7 +73,7 @@
                     </HBox>
                 </VBox>
             </Tab>
-            <Tab text="模板列表" closable="false">
+            <Tab text="规则配置" closable="false">
                 <BorderPane>
                     <center>
                         <SplitPane dividerPositions="0.35">
