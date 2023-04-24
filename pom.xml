@@ -103,6 +103,7 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <outputDirectory>${project.build.directory}/dist</outputDirectory>
+                    <excludeGroupIds>org.projectlombok</excludeGroupIds>
                 </configuration>
                 <executions>
                     <execution>
